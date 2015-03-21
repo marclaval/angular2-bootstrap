@@ -1,14 +1,19 @@
-var gulp = require('gulp');
 var del = require('del');
+var through2 = require('through2');
+
+var gulp = require('gulp');
 var concat = require('gulp-concat');
+var markdown = require('gulp-markdown');
 var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
 var traceur = require('gulp-traceur');
 
 var PATHS = {
     src: {
-      js: 'src/**/*.js',
-      html: 'src/**/*.html'
+      js: ['demo/**/*.js', 'src/**/*.js'],
+      html: ['demo/**/*.html', 'src/**/*.html'],
+      css: 'demo/**/*.css',
+      md: 'demo/**/*.md'
     },
     lib: [
       'node_modules/gulp-traceur/node_modules/traceur/bin/traceur-runtime.js',
@@ -35,10 +40,22 @@ gulp.task('js', function () {
         .pipe(rename({extname: '.js'})) //hack, see: https://github.com/sindresorhus/gulp-traceur/issues/54
         .pipe(gulp.dest('dist'));
 });
-
 gulp.task('html', function () {
-    return gulp.src(PATHS.src.html)
-        .pipe(gulp.dest('dist'));
+    return gulp.src(PATHS.src.html).pipe(gulp.dest('dist'));
+});
+gulp.task('css', function () {
+    return gulp.src(PATHS.src.css).pipe(gulp.dest('dist'));
+});
+function convertTables() {
+    return through2.obj(function(file, encoding, done) {
+        var content = String(file.contents).replace(/<table>/g, '<table class="table table-bordered">');
+        file.contents = new Buffer(content);
+        this.push(file);
+        done();
+    });
+}
+gulp.task('md', function () {
+    return gulp.src(PATHS.src.md).pipe(markdown()).pipe(convertTables()).pipe(gulp.dest('dist'));
 });
 
 gulp.task('libs', ['angular2'], function () {
@@ -47,7 +64,6 @@ gulp.task('libs', ['angular2'], function () {
 });
 
 gulp.task('angular2', function () {
-
     //transpile & concat
     return gulp.src([
             'node_modules/angular2/es6/prod/*.es6',
@@ -63,7 +79,6 @@ gulp.task('angular2', function () {
 });
 
 gulp.task('play', ['default'], function () {
-
     var http = require('http');
     var connect = require('connect');
     var serveStatic = require('serve-static');
@@ -72,6 +87,8 @@ gulp.task('play', ['default'], function () {
     var port = 9000, app;
 
     gulp.watch(PATHS.src.html, ['html']);
+    gulp.watch(PATHS.src.css, ['css']);
+    gulp.watch(PATHS.src.md, ['md']);
     gulp.watch(PATHS.src.js, ['js']);
 
     app = connect().use(serveStatic(__dirname + '/dist'));  // serve everything that is static
@@ -80,4 +97,4 @@ gulp.task('play', ['default'], function () {
     });
 });
 
-gulp.task('default', ['js', 'html', 'libs']);
+gulp.task('default', ['js', 'html', 'css', 'md', 'libs']);
