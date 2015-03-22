@@ -1,1 +1,17 @@
-Hello Carousel!
+
+  <div class="carousel slide">
+    <ol class="carousel-indicators">
+      <li *foreach="#slide in slides" title="{{slide.index}}" [class.active]="slide.index == activeIndex" (click)="navigateTo(slide.index)"></li>
+    </ol>
+    <div class="carousel-inner" role="listbox">
+      <content></content>
+    </div>
+    <a class="left carousel-control" role="button" (^click)="prev()">
+      <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+    <a class="right carousel-control" role="button" (^click)="next()">
+      <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
+    </a>
+  </div>

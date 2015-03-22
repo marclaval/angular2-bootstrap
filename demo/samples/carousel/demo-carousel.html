@@ -1,2 +1,26 @@
-Let's demo the carousel!
-<carousel></carousel>
+<carousel interval="5000" [index]="slideIndex" wrap="false" (indexchange)="onIndexChange($event)">
+  <div slide>
+    <img style="width: 800px; height: 400px;" src="http://placekitten.com/800/400">
+    <div caption>
+      <h3>First slide label</h3>
+      <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
+    </div>
+  </div>
+  <div slide>
+    <img style="width: 800px; height: 400px;" src="http://placekitten.com/801/400">
+  </div>
+  <div slide>
+    <img style="width: 800px; height: 400px;" src="http://placekitten.com/800/401">
+  </div>
+</carousel>
+
+<form role="form">
+  <div class="form-group">
+    <label for="indexField">Index (0-based)</label>
+    <input type="number" class="form-control" [value]="slideIndex" (change)="onIndexFieldChange($event)">
+  </div>
+  <!--<div class="form-group">
+    <label for="intervalField">Interval (negative number to stop the cycle)</label>
+    <input type="number" class="form-control" id="intervalField" value="{{slideInterval}}">
+  </div>-->
+</form>
