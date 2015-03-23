@@ -5,7 +5,14 @@ import {EventEmitter} from 'angular2/src/core/annotations/di';
 @Component({
   selector: 'carousel',
   bind : {
-    'index': 'index'
+    'index': 'index',
+    'wrap': 'wrap',
+    'interval': 'interval',
+    'pause': 'pause'
+  },
+  events: {
+    'mouseenter': 'toggleOnHover()',
+    'mouseleave': 'toggleOnHover()'
   }
 })
 @Template({
@@ -17,13 +24,25 @@ export class Carousel {
     this.emitter = emitter;
     this.activeIndex = 0;
     this.slides = [];
+    this.wrap = true;
+    this._interval = 5000;
+    this.pause = "hover",
+    this.timerId = null;
+    this._startCycling();
   }
   set index(newValue) {
-    this.activeIndex = newValue;
-    this.slides.forEach((slide) => {
-      slide.refresh(this);
-    });
-    this.emitter(newValue);
+    if (newValue >= 0 && newValue <= this.slides.length - 1) {
+      this.activeIndex = newValue;
+      this.slides.forEach((slide) => {
+        slide.refresh(this);
+      });
+    }
+    this.emitter(this.activeIndex);
+  }
+  set interval(newValue) {
+    this._interval = newValue;
+    this._stopCycling();
+    this._startCycling();
   }
   registerSlide(slide: Slide) {
     this.slides.push(slide);
@@ -31,20 +50,56 @@ export class Carousel {
   navigateTo(newIndex) {
     this.index = newIndex;
   }
-  next() {
-    var nextIndex = (this.activeIndex + 1) % this.slides.length;
-    this.index = nextIndex;
-  }
   prev() {
-    var prevIndex = this.activeIndex - 1 < 0 ? this.slides.length - 1 : this.activeIndex - 1;
-    this.index = prevIndex;
+    if (this.hasPrev()) {
+      var prevIndex = this.activeIndex - 1 < 0 ? this.slides.length - 1 : this.activeIndex - 1;
+      this.index = prevIndex;
+    }
+  }
+  next() {
+    if (this.hasNext()) {
+      var nextIndex = (this.activeIndex + 1) % this.slides.length;
+      this.index = nextIndex;
+    }
+  }
+  hasPrev() {
+    return this.slides.length > 1 &&  !(!this.wrap && this.activeIndex === 0);
+  }
+  hasNext() {
+    return this.slides.length > 1 && !(!this.wrap && this.activeIndex === (this.slides.length - 1));
+  }
+  _startCycling() {
+    if (this._interval >= 0) {
+      this.timerId = setInterval(() => {
+        this.next();
+      }, this._interval > 600 ? this._interval: 600); //600ms is the transition duration defined in BS css
+    }
+  }
+  _stopCycling() {
+    if (this.timerId) {
+      clearInterval(this.timerId);
+    }
+    this.timerId = null;
+  }
+  toggleOnHover() {
+    console.log("Toggle")
+    if (this.pause === "hover") {
+      if (this.timerId) {
+        this._stopCycling();
+      } else {
+        this._startCycling();
+      }
+    }
   }
 }
 
-@Decorator({
-  selector: '[slide]'
+@Component({
+  selector: 'carousel-slide'
 })
-export class Slide {
+@Template({
+  inline: '<content></content>'
+})
+export class CarouselSlide {
   constructor(el: NgElement, @Ancestor() carousel: Carousel) {
     this.el = el;
     DOM.addClass(el.domElement, "item");
@@ -61,11 +116,32 @@ export class Slide {
   }
 }
 
-@Decorator({
-  selector: '[caption]'
+@Component({
+  selector: 'carousel-caption'
 })
-export class Caption {
+@Template({
+  inline: '<content></content>'
+})
+export class CarouselCaption {
   constructor(el: NgElement) {
     DOM.addClass(el.domElement, "carousel-caption");
   }
+}
+
+// CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
+// ============================================================
+function getTransitionEnd() {
+    var el = document.createElement('angular2-bootstrap');
+    var transEndEventNames = {
+        WebkitTransition : 'webkitTransitionEnd',
+        MozTransition    : 'transitionend',
+        OTransition      : 'oTransitionEnd otransitionend',
+        transition       : 'transitionend'
+    };
+    for (var name in transEndEventNames) {
+        if (el.style[name] !== undefined) {
+            return transEndEventNames[name];
+        }
+    }
+    return false;
 }

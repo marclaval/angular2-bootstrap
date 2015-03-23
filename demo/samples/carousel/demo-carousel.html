@@ -1,26 +1,40 @@
-<carousel interval="5000" [index]="slideIndex" wrap="false" (indexchange)="onIndexChange($event)">
-  <div slide>
+<carousel [interval]="slideInterval" [index]="slideIndex" [wrap]="slideWrap" [pause]="slidePause" (indexchange)="onIndexChange($event)">
+  <carousel-slide>
     <img style="width: 800px; height: 400px;" src="http://placekitten.com/800/400">
-    <div caption>
+    <carousel-caption>
       <h3>First slide label</h3>
       <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
-    </div>
-  </div>
-  <div slide>
+    </carousel-caption>
+  </carousel-slide>
+  <carousel-slide>
     <img style="width: 800px; height: 400px;" src="http://placekitten.com/801/400">
-  </div>
-  <div slide>
+  </carousel-slide>
+  <carousel-slide>
     <img style="width: 800px; height: 400px;" src="http://placekitten.com/800/401">
-  </div>
+  </carousel-slide>
 </carousel>
 
 <form role="form">
   <div class="form-group">
-    <label for="indexField">Index (0-based)</label>
+    <label>Index (0-based)</label>
     <input type="number" class="form-control" [value]="slideIndex" (change)="onIndexFieldChange($event)">
   </div>
-  <!--<div class="form-group">
-    <label for="intervalField">Interval (negative number to stop the cycle)</label>
-    <input type="number" class="form-control" id="intervalField" value="{{slideInterval}}">
-  </div>-->
+  <div class="form-group">
+    <label>Interval (negative number to stop the cycle)</label>
+    <input type="number" class="form-control" [value]="slideInterval" (change)="onIntervalFieldChange($event)">
+  </div>
+  <div class="form-group">
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" [checked]="slideWrap" (change)="onWrapCheckboxChange($event)"> Wrap active
+      </label>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" [checked]="slidePause" (change)="onPauseCheckboxChange($event)"> Pause on hover
+      </label>
+    </div>
+  </div>
 </form>
