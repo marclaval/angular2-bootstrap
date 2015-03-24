@@ -1,4 +1,4 @@
-import {Component, Template, Decorator, NgElement, Ancestor, Foreach} from 'angular2/angular2';
+import {Component, Template, Decorator, NgElement, Ancestor, For} from 'angular2/angular2';
 import {DOM} from 'angular2/src/dom/dom_adapter';
 import {EventEmitter} from 'angular2/src/core/annotations/di';
 
@@ -17,7 +17,7 @@ import {EventEmitter} from 'angular2/src/core/annotations/di';
 })
 @Template({
   url: './carousel/carousel.html',
-  directives: [Foreach]
+  directives: [For]
 })
 export class Carousel {
   constructor(@EventEmitter('indexchange') emitter:Function) {
