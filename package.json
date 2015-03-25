@@ -23,7 +23,13 @@
     "gulp-traceur": "0.16.*",
     "open": "0.0.5",
     "serve-static": "~1.8.1",
-    "through2": "~0.6.3"
+    "through2": "~0.6.3",
+    "karma": "^0.12.23",
+    "karma-chrome-launcher": "^0.1.4",
+    "karma-cli": "^0.0.4",
+    "karma-jasmine": "^0.2.2",
+    "karma-traceur-preprocessor": "^0.4.0",
+    "traceur": "0.0.82"
   },
   "dependencies": {
     "angular2": "2.0.0-alpha.15",

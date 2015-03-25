@@ -3,6 +3,7 @@ var through2 = require('through2');
 
 var gulp = require('gulp');
 var concat = require('gulp-concat');
+var karma = require('karma').server;
 var markdown = require('gulp-markdown');
 var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
@@ -99,3 +100,7 @@ gulp.task('play', ['default'], function () {
 });
 
 gulp.task('default', ['js', 'html', 'css', 'md', 'libs']);
+
+gulp.task('test', ['angular2'], function (done) {
+  karma.start({configFile: __dirname + '/karma.conf.js'}, done);
+});
