@@ -8,7 +8,7 @@ A carousel component similar to [Bootstrap javascript carousel](http://getbootst
 | **interval** | int | 5000 | The amount of time to delay between automatically cycling an item. If false or negative, carousel will not automatically cycle. |
 | **pause** | string | "hover" | Pauses the cycling of the carousel on mouseover and resumes the cycling of the carousel on mouseout. |
 | **wrap** | boolean | true | Whether the carousel should cycle continuously or have hard stops. |
-| **noTransition** | boolean | false | Whether transitions are activated. (NOT IMPLEMENTED) |
+| **no-transition** | boolean | false | Whether transitions are activated. |
 
 #### Elements ####
 | Name | Description |  |

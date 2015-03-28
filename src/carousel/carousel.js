@@ -1,6 +1,5 @@
 import {Component, Template, Decorator, NgElement, Ancestor, For} from 'angular2/angular2';
-import {DOM} from 'angular2/src/dom/dom_adapter';
-import {EventEmitter} from 'angular2/src/core/annotations/di';
+import {EventEmitter, PropertySetter} from 'angular2/src/core/annotations/di';
 
 @Component({
   selector: 'carousel',
@@ -8,7 +7,8 @@ import {EventEmitter} from 'angular2/src/core/annotations/di';
     'index': 'index',
     'wrap': 'wrap',
     'interval': 'interval',
-    'pause': 'pause'
+    'pause': 'pause',
+    'noTransition': 'no-transition'
   },
   events: {
     'mouseenter': 'toggleOnHover()',
@@ -28,7 +28,8 @@ export class Carousel {
     this._interval = 5000;
     this.pause = "hover",
     this.timerId = null;
-    this.transitionEnd = this.noTransition ? false : getTransitionEnd();
+    this.noTransition = false;
+    this.transitionEnd = getTransitionEnd();
     this._isToRight = true;
     this._isChangingSlide = false;
     this._startCycling();
@@ -40,16 +41,16 @@ export class Carousel {
       var nextSlide = this.slides[newValue];
       if (this.activeIndex == -1) {
         this._finalizeTransition(null, nextSlide, newValue);
-      } else if (this.transitionEnd) {
-        nextSlide.prepareAnimation(this._isToRight ? "next" : "prev");
+      } else if (!this.noTransition && this.transitionEnd) {
+        nextSlide.prepareAnimation(this._isToRight);
         setTimeout(() => {
-          currentSlide.animate(this._isToRight ? "left" : "right");
-          nextSlide.animate(this._isToRight ? "left" : "right");
+          currentSlide.animate(this._isToRight);
+          nextSlide.animate(this._isToRight);
           var endAnimationCallback = (event) => {
-            currentSlide.el.domElement.removeEventListener(this.transitionEnd, endAnimationCallback, false);
+            currentSlide.getElement().removeEventListener(this.transitionEnd, endAnimationCallback, false);
             this._finalizeTransition(currentSlide, nextSlide, newValue);
           };
-          currentSlide.el.domElement.addEventListener(this.transitionEnd, endAnimationCallback, false);
+          currentSlide.getElement().addEventListener(this.transitionEnd, endAnimationCallback, false);
         }, 30);
       } else {
         this._finalizeTransition(currentSlide, nextSlide, newValue);
@@ -123,48 +124,35 @@ export class Carousel {
   }
 }
 
-@Component({
+@Decorator({
   selector: 'carousel-slide'
 })
-@Template({
-  inline: '<content></content>'
-})
 export class CarouselSlide {
-  constructor(el: NgElement, @Ancestor() carousel: Carousel) {
-    this.el = el;
-    DOM.addClass(el.domElement, "item");
+  constructor(el: NgElement, @Ancestor() carousel: Carousel,
+    @PropertySetter('class.active') activeSetter: Function, @PropertySetter('class.item') itemSetter: Function,
+    @PropertySetter('class.left') leftSetter: Function, @PropertySetter('class.right') rightSetter: Function,
+    @PropertySetter('class.prev') prevSetter: Function, @PropertySetter('class.next') nextSetter: Function) {
+    this.el = el.domElement;
     this.index = carousel.slides.length;
     carousel.registerSlide(this);
+    itemSetter(true);
+    this.activate = () => {activeSetter(true)};
+    this.deactivate = () => {activeSetter(false)};
+    this.prepareAnimation = (isToRight) => {isToRight ? nextSetter(true) : prevSetter(true)};
+    this.animate = (isToRight) => {isToRight ? leftSetter(true) : rightSetter(true)};
+    this.cleanAfterAnimation = () => {leftSetter(false); rightSetter(false); nextSetter(false); prevSetter(false)};
   }
-  activate() {
-    DOM.addClass(this.el.domElement, "active");
-  }
-  deactivate(){
-    DOM.removeClass(this.el.domElement, "active");
-  }
-  prepareAnimation(className) {
-    DOM.addClass(this.el.domElement, className);
-  }
-  animate(className) {
-    DOM.addClass(this.el.domElement, className);
-  }
-  cleanAfterAnimation() {
-    DOM.removeClass(this.el.domElement, "left");
-    DOM.removeClass(this.el.domElement, "next");
-    DOM.removeClass(this.el.domElement, "right");
-    DOM.removeClass(this.el.domElement, "prev");
+  getElement() {
+    return this.el;
   }
 }
 
-@Component({
+@Decorator({
   selector: 'carousel-caption'
 })
-@Template({
-  inline: '<content></content>'
-})
 export class CarouselCaption {
-  constructor(el: NgElement) {
-    DOM.addClass(el.domElement, "carousel-caption");
+  constructor(@PropertySetter('class.carousel-caption') captionSetter: Function) {
+    captionSetter(true);
   }
 }
 

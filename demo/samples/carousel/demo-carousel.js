@@ -14,6 +14,7 @@ export class DemoCarousel {
     this.slideWrap = true;
     this.slideInterval = 5000;
     this.slidePause = "hover";
+    this.slideNoTransition = false;
   }
   onIndexFieldChange(event) {
     this.slideIndex = event.target.value;
@@ -29,5 +30,8 @@ export class DemoCarousel {
   }
   onPauseCheckboxChange(event) {
     this.slidePause = event.target.checked ? "hover": "";
+  }
+  onAnimationCheckboxChange(event) {
+    this.slideNoTransition = !event.target.checked;
   }
 }

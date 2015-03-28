@@ -1,4 +1,4 @@
-<carousel [interval]="slideInterval" [index]="slideIndex" [wrap]="slideWrap" [pause]="slidePause" (indexchange)="onIndexChange($event)">
+<carousel [interval]="slideInterval" [index]="slideIndex" [wrap]="slideWrap" [pause]="slidePause" [no-transition]="slideNoTransition" (indexchange)="onIndexChange($event)">
   <carousel-slide>
     <img style="width: 800px; height: 400px;" src="http://placekitten.com/800/400">
     <carousel-caption>
@@ -34,6 +34,13 @@
     <div class="checkbox">
       <label>
         <input type="checkbox" [checked]="slidePause" (change)="onPauseCheckboxChange($event)"> Pause on hover
+      </label>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" [checked]="!slideNoTransition" (change)="onAnimationCheckboxChange($event)"> With animations
       </label>
     </div>
   </div>
