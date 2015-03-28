@@ -20,8 +20,12 @@ import {EventEmitter, PropertySetter} from 'angular2/src/core/annotations/di';
   directives: [For]
 })
 export class Carousel {
-  constructor(@EventEmitter('indexchange') emitter:Function) {
-    this.emitter = emitter;
+  constructor(@EventEmitter('indexchange') indexChangeEmitter:Function,
+    @EventEmitter('slidestart') slidestartEmitter:Function,
+    @EventEmitter('slideend') slideendEmitter:Function) {
+    this.indexChangeEmitter = indexChangeEmitter;
+    this.slidestartEmitter = slidestartEmitter;
+    this.slideendEmitter = slideendEmitter;
     this.activeIndex = -1;
     this.slides = [];
     this.wrap = true;
@@ -37,6 +41,7 @@ export class Carousel {
   set index(newValue) {
     if (!this._isChangingSlide && newValue != this.activeIndex && newValue >= 0 && newValue <= this.slides.length - 1) {
       this._isChangingSlide = true;
+      this.slidestartEmitter();
       var currentSlide = this.slides[this.activeIndex];
       var nextSlide = this.slides[newValue];
       if (this.activeIndex == -1) {
@@ -66,7 +71,8 @@ export class Carousel {
     nextSlide.cleanAfterAnimation();
     this.activeIndex = newValue;
     this._isChangingSlide = false;
-    this.emitter(this.activeIndex);
+    this.slideendEmitter();
+    this.indexChangeEmitter(this.activeIndex);
   }
   set interval(newValue) {
     this._interval = newValue;

@@ -21,5 +21,5 @@ A carousel component similar to [Bootstrap javascript carousel](http://getbootst
 | Name | Description |
 | ---- | ----------- |
 | **indexchange** | This event fires when the index changes. |
-| **onslidestart** | This event fires immediately when the transition starts. (NOT IMPLEMENTED) |
-| **onslideend** | This event is fired when the carousel has completed its slide transition. (NOT IMPLEMENTED) |
+| **slidestart** | This event fires immediately when the transition starts. |
+| **slideend** | This event is fired when the carousel has completed its slide transition. |

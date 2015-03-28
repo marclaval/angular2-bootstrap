@@ -34,4 +34,10 @@ export class DemoCarousel {
   onAnimationCheckboxChange(event) {
     this.slideNoTransition = !event.target.checked;
   }
+  onSlideStart() {
+    console.log("Start sliding");
+  }
+  onSlideEnd() {
+    console.log("End sliding");
+  }
 }

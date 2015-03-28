@@ -1,4 +1,4 @@
-<carousel [interval]="slideInterval" [index]="slideIndex" [wrap]="slideWrap" [pause]="slidePause" [no-transition]="slideNoTransition" (indexchange)="onIndexChange($event)">
+<carousel [interval]="slideInterval" [index]="slideIndex" [wrap]="slideWrap" [pause]="slidePause" [no-transition]="slideNoTransition" (indexchange)="onIndexChange($event)" (slidestart)="onSlideStart()" (slideend)="onSlideEnd()">
   <carousel-slide>
     <img style="width: 800px; height: 400px;" src="http://placekitten.com/800/400">
     <carousel-caption>
