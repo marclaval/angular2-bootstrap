@@ -3,11 +3,13 @@
 
 Angular2 directives for Bootstrap.  
 Project started from: https://github.com/pkozlowski-opensource/ng2-play  
-
+  
+**Demo available here:** http://mlaval.github.io/angular2-bootstrap/  
+  
 Already implemented:  
+ - Carousel
 
 To be implemented:
- - Carousel
  - Togglable tabs
  - Alert messages
  - Dropdown

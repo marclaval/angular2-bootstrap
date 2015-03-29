@@ -1,7 +1,7 @@
 
   <div class="carousel slide">
     <ol class="carousel-indicators">
-      <li *for="#slide of slides" title="{{slide.index}}" [class.active]="slide.index == activeIndex" (click)="navigateTo(slide.index)"></li>
+      <li *for="#slide of slides" [class.active]="slide.index == activeIndex" (click)="navigateTo(slide.index)"></li>
     </ol>
     <div class="carousel-inner" role="listbox">
       <content></content>

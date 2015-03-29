@@ -137,11 +137,13 @@ export class CarouselSlide {
   constructor(el: NgElement, @Ancestor() carousel: Carousel,
     @PropertySetter('class.active') activeSetter: Function, @PropertySetter('class.item') itemSetter: Function,
     @PropertySetter('class.left') leftSetter: Function, @PropertySetter('class.right') rightSetter: Function,
-    @PropertySetter('class.prev') prevSetter: Function, @PropertySetter('class.next') nextSetter: Function) {
+    @PropertySetter('class.prev') prevSetter: Function, @PropertySetter('class.next') nextSetter: Function,
+    @PropertySetter('attr.role') roleSetter: Function) {
     this.el = el.domElement;
     this.index = carousel.slides.length;
     carousel.registerSlide(this);
     itemSetter(true);
+    roleSetter("listbox");
     this.activate = () => {activeSetter(true)};
     this.deactivate = () => {activeSetter(false)};
     this.prepareAnimation = (isToRight) => {isToRight ? nextSetter(true) : prevSetter(true)};
