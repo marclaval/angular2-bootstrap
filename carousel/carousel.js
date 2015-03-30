@@ -7,6 +7,7 @@ System.register("carousel/carousel", ["angular2/angular2", "angular2/src/core/an
       NgElement,
       Ancestor,
       For,
+      onDestroy,
       EventEmitter,
       PropertySetter,
       Carousel,
@@ -20,7 +21,7 @@ System.register("carousel/carousel", ["angular2/angular2", "angular2/src/core/an
       OTransition: 'oTransitionEnd otransitionend',
       transition: 'transitionend'
     };
-    for (var name = void 0 in transEndEventNames) {
+    for (var name in transEndEventNames) {
       if (el.style[name] !== undefined) {
         return transEndEventNames[name];
       }
@@ -35,6 +36,7 @@ System.register("carousel/carousel", ["angular2/angular2", "angular2/src/core/an
       NgElement = $__m.NgElement;
       Ancestor = $__m.Ancestor;
       For = $__m.For;
+      onDestroy = $__m.onDestroy;
     }, function($__m) {
       EventEmitter = $__m.EventEmitter;
       PropertySetter = $__m.PropertySetter;
@@ -61,12 +63,15 @@ System.register("carousel/carousel", ["angular2/angular2", "angular2/src/core/an
             var $__0 = this;
             if (!this._isChangingSlide && newValue != this.activeIndex && newValue >= 0 && newValue <= this.slides.length - 1) {
               this._isChangingSlide = true;
+              if (this._isToRight == null) {
+                this._isToRight = newValue > this.activeIndex;
+              }
               this.slidestartEmitter();
               var currentSlide = this.slides[this.activeIndex];
               var nextSlide = this.slides[newValue];
               if (this.activeIndex == -1) {
                 this._finalizeTransition(null, nextSlide, newValue);
-              } else if (!this.noTransition && this.transitionEnd) {
+              } else if (!this.noTransition && this.transitionEnd && currentSlide) {
                 nextSlide.prepareAnimation(this._isToRight);
                 setTimeout((function() {
                   currentSlide.animate($__0._isToRight);
@@ -89,8 +94,9 @@ System.register("carousel/carousel", ["angular2/angular2", "angular2/src/core/an
             }
             nextSlide.activate();
             nextSlide.cleanAfterAnimation();
-            this.activeIndex = newValue;
+            this.activeIndex = parseInt(newValue);
             this._isChangingSlide = false;
+            this._isToRight = null;
             this.slideendEmitter();
             this.indexChangeEmitter(this.activeIndex);
           },
@@ -99,11 +105,52 @@ System.register("carousel/carousel", ["angular2/angular2", "angular2/src/core/an
             this._stopCycling();
             this._startCycling();
           },
-          registerSlide: function(slide) {
-            this.slides.push(slide);
+          registerSlide: function(slide, slideIndex) {
+            var activeSlide = this.slides[this.activeIndex];
+            this.slides.splice(slideIndex, 0, slide);
+            if (activeSlide) {
+              var newIndex = this.slides.indexOf(activeSlide);
+              if (newIndex != this.activeIndex) {
+                this.activeIndex = newIndex;
+                this.indexChangeEmitter(this.activeIndex);
+              }
+            }
+            this._resetAfterSlidesChange();
+          },
+          unregisterSlide: function(slide) {
+            var index = this.slides.indexOf(slide);
+            if (index > -1) {
+              var activeSlide = this.slides[this.activeIndex];
+              slide.deactivate();
+              slide.cleanAfterAnimation();
+              this.slides.splice(index, 1);
+              if (activeSlide == slide) {
+                var activeIndex = this.activeIndex;
+                this.activeIndex = -1;
+                this.index = activeIndex < this.slides.length ? activeIndex : this.slides.length - 1;
+              } else {
+                var newIndex = this.slides.indexOf(activeSlide);
+                if (newIndex != this.activeIndex) {
+                  this.activeIndex = newIndex;
+                  this.indexChangeEmitter(this.activeIndex);
+                }
+              }
+            }
+            this._resetAfterSlidesChange();
+          },
+          _resetAfterSlidesChange: function() {
+            for (var i = 0; i < this.slides.length; i++) {
+              var slide = this.slides[i];
+              slide.deactivate();
+              slide.cleanAfterAnimation();
+              if (i == this.activeIndex) {
+                slide.activate();
+              }
+            }
+            this._isChangingSlide = false;
+            this._isToRight = null;
           },
           navigateTo: function(newIndex) {
-            this._isToRight = newIndex > this.activeIndex;
             this.index = newIndex;
           },
           prev: function() {
@@ -174,15 +221,15 @@ System.register("carousel/carousel", ["angular2/angular2", "angular2/src/core/an
           return [[Function, new EventEmitter('indexchange')], [Function, new EventEmitter('slidestart')], [Function, new EventEmitter('slideend')]];
         }});
       Object.defineProperty(Carousel.prototype.registerSlide, "parameters", {get: function() {
+          return [[Slide], []];
+        }});
+      Object.defineProperty(Carousel.prototype.unregisterSlide, "parameters", {get: function() {
           return [[Slide]];
         }});
       CarouselSlide = $__export("CarouselSlide", (function() {
         var CarouselSlide = function CarouselSlide(el, carousel, activeSetter, itemSetter, leftSetter, rightSetter, prevSetter, nextSetter, roleSetter) {
+          this.carousel = carousel;
           this.el = el.domElement;
-          this.index = carousel.slides.length;
-          carousel.registerSlide(this);
-          itemSetter(true);
-          roleSetter("listbox");
           this.activate = (function() {
             activeSetter(true);
           });
@@ -201,13 +248,25 @@ System.register("carousel/carousel", ["angular2/angular2", "angular2/src/core/an
             nextSetter(false);
             prevSetter(false);
           });
+          var slideIndex = [].indexOf.call(this.el.parentNode.querySelectorAll('carousel-slide'), this.el);
+          carousel.registerSlide(this, slideIndex);
+          itemSetter(true);
+          roleSetter("listbox");
         };
-        return ($traceurRuntime.createClass)(CarouselSlide, {getElement: function() {
+        return ($traceurRuntime.createClass)(CarouselSlide, {
+          getElement: function() {
             return this.el;
-          }}, {});
+          },
+          onDestroy: function() {
+            this.carousel.unregisterSlide(this);
+          }
+        }, {});
       }()));
       Object.defineProperty(CarouselSlide, "annotations", {get: function() {
-          return [new Decorator({selector: 'carousel-slide'})];
+          return [new Decorator({
+            selector: 'carousel-slide',
+            lifecycle: [onDestroy]
+          })];
         }});
       Object.defineProperty(CarouselSlide, "parameters", {get: function() {
           return [[NgElement], [Carousel, new Ancestor()], [Function, new PropertySetter('class.active')], [Function, new PropertySetter('class.item')], [Function, new PropertySetter('class.left')], [Function, new PropertySetter('class.right')], [Function, new PropertySetter('class.prev')], [Function, new PropertySetter('class.next')], [Function, new PropertySetter('attr.role')]];

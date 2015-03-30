@@ -17,7 +17,9 @@ System.register("demo-app", ["angular2/angular2", "./samples/carousel/demo-carou
     }],
     execute: function() {
       DemoApp = $__export("DemoApp", (function() {
-        var DemoApp = function DemoApp() {};
+        var DemoApp = function DemoApp() {
+          ;
+        };
         return ($traceurRuntime.createClass)(DemoApp, {}, {});
       }()));
       Object.defineProperty(DemoApp, "annotations", {get: function() {

@@ -11,7 +11,9 @@ System.register("samples/carousel/doc-carousel", ["angular2/angular2"], function
     }],
     execute: function() {
       DocCarousel = $__export("DocCarousel", (function() {
-        var DocCarousel = function DocCarousel() {};
+        var DocCarousel = function DocCarousel() {
+          ;
+        };
         return ($traceurRuntime.createClass)(DocCarousel, {}, {});
       }()));
       Object.defineProperty(DocCarousel, "annotations", {get: function() {

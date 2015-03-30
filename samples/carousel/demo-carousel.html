@@ -6,11 +6,17 @@
       <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
     </carousel-caption>
   </carousel-slide>
+  <carousel-slide *if="extraSlides">
+    <img style="width: 800px; height: 400px;" src="http://placekitten.com/800/399">
+  </carousel-slide>
   <carousel-slide>
     <img style="width: 800px; height: 400px;" src="http://placekitten.com/801/400">
   </carousel-slide>
   <carousel-slide>
     <img style="width: 800px; height: 400px;" src="http://placekitten.com/800/401">
+  </carousel-slide>
+  <carousel-slide *if="extraSlides">
+    <img style="width: 800px; height: 400px;" src="http://placekitten.com/800/402">
   </carousel-slide>
 </carousel>
 
@@ -41,6 +47,13 @@
     <div class="checkbox">
       <label>
         <input type="checkbox" [checked]="!slideNoTransition" (change)="onAnimationCheckboxChange($event)"> With animations
+      </label>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" [checked]="extraSlides" (change)="onExtraCheckboxChange($event)"> Add/Remove extra slides (2nd and last positions)
       </label>
     </div>
   </div>

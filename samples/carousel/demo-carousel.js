@@ -3,6 +3,7 @@ System.register("samples/carousel/demo-carousel", ["angular2/angular2", "carouse
   var __moduleName = "samples/carousel/demo-carousel";
   var Component,
       Template,
+      If,
       Carousel,
       CarouselSlide,
       CarouselCaption,
@@ -11,6 +12,7 @@ System.register("samples/carousel/demo-carousel", ["angular2/angular2", "carouse
     setters: [function($__m) {
       Component = $__m.Component;
       Template = $__m.Template;
+      If = $__m.If;
     }, function($__m) {
       Carousel = $__m.Carousel;
       CarouselSlide = $__m.CarouselSlide;
@@ -24,6 +26,7 @@ System.register("samples/carousel/demo-carousel", ["angular2/angular2", "carouse
           this.slideInterval = 5000;
           this.slidePause = "hover";
           this.slideNoTransition = false;
+          this.extraSlides = false;
         };
         return ($traceurRuntime.createClass)(DemoCarousel, {
           onIndexFieldChange: function(event) {
@@ -44,18 +47,17 @@ System.register("samples/carousel/demo-carousel", ["angular2/angular2", "carouse
           onAnimationCheckboxChange: function(event) {
             this.slideNoTransition = !event.target.checked;
           },
-          onSlideStart: function() {
-            console.log("Start sliding");
+          onExtraCheckboxChange: function(event) {
+            this.extraSlides = event.target.checked;
           },
-          onSlideEnd: function() {
-            console.log("End sliding");
-          }
+          onSlideStart: function() {},
+          onSlideEnd: function() {}
         }, {});
       }()));
       Object.defineProperty(DemoCarousel, "annotations", {get: function() {
           return [new Component({selector: 'demo-carousel'}), new Template({
             url: './samples/carousel/demo-carousel.html',
-            directives: [Carousel, CarouselSlide, CarouselCaption]
+            directives: [If, Carousel, CarouselSlide, CarouselCaption]
           })];
         }});
     }
