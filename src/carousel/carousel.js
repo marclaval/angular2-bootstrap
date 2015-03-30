@@ -1,4 +1,4 @@
-import {Component, Template, Decorator, NgElement, Ancestor, For} from 'angular2/angular2';
+import {Component, Template, Decorator, NgElement, Ancestor, For, onDestroy} from 'angular2/angular2';
 import {EventEmitter, PropertySetter} from 'angular2/src/core/annotations/di';
 
 @Component({
@@ -41,12 +41,15 @@ export class Carousel {
   set index(newValue) {
     if (!this._isChangingSlide && newValue != this.activeIndex && newValue >= 0 && newValue <= this.slides.length - 1) {
       this._isChangingSlide = true;
+      if (this._isToRight == null) {
+        this._isToRight = newValue > this.activeIndex;
+      }
       this.slidestartEmitter();
       var currentSlide = this.slides[this.activeIndex];
       var nextSlide = this.slides[newValue];
       if (this.activeIndex == -1) {
         this._finalizeTransition(null, nextSlide, newValue);
-      } else if (!this.noTransition && this.transitionEnd) {
+      } else if (!this.noTransition && this.transitionEnd && currentSlide) {
         nextSlide.prepareAnimation(this._isToRight);
         setTimeout(() => {
           currentSlide.animate(this._isToRight);
@@ -69,8 +72,9 @@ export class Carousel {
     }
     nextSlide.activate();
     nextSlide.cleanAfterAnimation();
-    this.activeIndex = newValue;
+    this.activeIndex = parseInt(newValue);
     this._isChangingSlide = false;
+    this._isToRight = null;
     this.slideendEmitter();
     this.indexChangeEmitter(this.activeIndex);
   }
@@ -79,11 +83,52 @@ export class Carousel {
     this._stopCycling();
     this._startCycling();
   }
-  registerSlide(slide: Slide) {
-    this.slides.push(slide);
+  registerSlide(slide: Slide, slideIndex) {
+    var activeSlide = this.slides[this.activeIndex];
+    this.slides.splice(slideIndex, 0, slide);
+    if (activeSlide) {
+      var newIndex = this.slides.indexOf(activeSlide);
+      if (newIndex != this.activeIndex) {
+        this.activeIndex = newIndex;
+        this.indexChangeEmitter(this.activeIndex);
+      }
+    }
+    this._resetAfterSlidesChange();
+  }
+  unregisterSlide(slide: Slide) {
+    var index = this.slides.indexOf(slide);
+    if (index > -1) {
+      var activeSlide = this.slides[this.activeIndex];
+      slide.deactivate();
+      slide.cleanAfterAnimation();
+      this.slides.splice(index, 1);
+      if (activeSlide == slide) {
+        var activeIndex = this.activeIndex;
+        this.activeIndex = -1;
+        this.index = activeIndex < this.slides.length ? activeIndex : this.slides.length - 1;
+      } else {
+        var newIndex = this.slides.indexOf(activeSlide);
+        if (newIndex != this.activeIndex) {
+          this.activeIndex = newIndex;
+          this.indexChangeEmitter(this.activeIndex);
+        }
+      }
+    }
+    this._resetAfterSlidesChange();
+  }
+  _resetAfterSlidesChange() {
+    for (var i = 0; i < this.slides.length; i++) {
+      var slide = this.slides[i];
+      slide.deactivate();
+      slide.cleanAfterAnimation();
+      if (i == this.activeIndex) {
+        slide.activate();
+      }
+    }
+    this._isChangingSlide = false;
+    this._isToRight = null;
   }
   navigateTo(newIndex) {
-    this._isToRight = newIndex > this.activeIndex;
     this.index = newIndex;
   }
   prev() {
@@ -131,7 +176,8 @@ export class Carousel {
 }
 
 @Decorator({
-  selector: 'carousel-slide'
+  selector: 'carousel-slide',
+  lifecycle: [onDestroy]
 })
 export class CarouselSlide {
   constructor(el: NgElement, @Ancestor() carousel: Carousel,
@@ -139,19 +185,24 @@ export class CarouselSlide {
     @PropertySetter('class.left') leftSetter: Function, @PropertySetter('class.right') rightSetter: Function,
     @PropertySetter('class.prev') prevSetter: Function, @PropertySetter('class.next') nextSetter: Function,
     @PropertySetter('attr.role') roleSetter: Function) {
+    this.carousel = carousel;
     this.el = el.domElement;
-    this.index = carousel.slides.length;
-    carousel.registerSlide(this);
-    itemSetter(true);
-    roleSetter("listbox");
     this.activate = () => {activeSetter(true)};
     this.deactivate = () => {activeSetter(false)};
     this.prepareAnimation = (isToRight) => {isToRight ? nextSetter(true) : prevSetter(true)};
     this.animate = (isToRight) => {isToRight ? leftSetter(true) : rightSetter(true)};
     this.cleanAfterAnimation = () => {leftSetter(false); rightSetter(false); nextSetter(false); prevSetter(false)};
+
+    var slideIndex = [].indexOf.call(this.el.parentNode.querySelectorAll('carousel-slide'), this.el);
+    carousel.registerSlide(this, slideIndex);
+    itemSetter(true);
+    roleSetter("listbox");
   }
   getElement() {
     return this.el;
+  }
+  onDestroy() {
+    this.carousel.unregisterSlide(this);
   }
 }
 

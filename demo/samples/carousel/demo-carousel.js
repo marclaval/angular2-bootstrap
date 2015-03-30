@@ -1,4 +1,4 @@
-import {Component, Template} from 'angular2/angular2';
+import {Component, Template, If} from 'angular2/angular2';
 import {Carousel, CarouselSlide, CarouselCaption} from 'carousel/carousel';
 
 @Component({
@@ -6,7 +6,7 @@ import {Carousel, CarouselSlide, CarouselCaption} from 'carousel/carousel';
 })
 @Template({
   url: './samples/carousel/demo-carousel.html',
-  directives: [Carousel, CarouselSlide, CarouselCaption]
+  directives: [If, Carousel, CarouselSlide, CarouselCaption]
 })
 export class DemoCarousel {
   constructor() {
@@ -15,6 +15,7 @@ export class DemoCarousel {
     this.slideInterval = 5000;
     this.slidePause = "hover";
     this.slideNoTransition = false;
+    this.extraSlides = false;
   }
   onIndexFieldChange(event) {
     this.slideIndex = event.target.value;
@@ -34,10 +35,13 @@ export class DemoCarousel {
   onAnimationCheckboxChange(event) {
     this.slideNoTransition = !event.target.checked;
   }
+  onExtraCheckboxChange(event) {
+    this.extraSlides = event.target.checked;
+  }
   onSlideStart() {
-    console.log("Start sliding");
+    //console.log("Start sliding");
   }
   onSlideEnd() {
-    console.log("End sliding");
+    //console.log("End sliding");
   }
 }
