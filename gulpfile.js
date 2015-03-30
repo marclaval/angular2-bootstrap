@@ -7,6 +7,7 @@ var markdown = require('gulp-markdown');
 var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
 var traceur = require('gulp-traceur');
+var uglify = require('gulp-uglify');
 
 var PATHS = {
     src: {
@@ -63,6 +64,7 @@ gulp.task('md', function () {
 
 gulp.task('libs', ['angular2'], function () {
     return gulp.src(PATHS.lib)
+        .pipe(uglify())
         .pipe(gulp.dest('dist/lib'));
 });
 
@@ -78,6 +80,7 @@ gulp.task('angular2', function () {
         })) 
         .pipe(traceur({ modules: 'instantiate', moduleName: true}))
         .pipe(concat('angular2.js'))
+        .pipe(uglify())
         .pipe(gulp.dest('dist/lib'));
 });
 
