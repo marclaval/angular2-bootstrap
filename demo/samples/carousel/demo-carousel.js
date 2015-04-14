@@ -1,11 +1,11 @@
-import {Component, Template, If} from 'angular2/angular2';
+import {Component, View, If} from 'angular2/angular2';
 import {Carousel, CarouselSlide, CarouselCaption} from 'carousel/carousel';
 
 @Component({
   selector: 'demo-carousel'
 })
-@Template({
-  url: './samples/carousel/demo-carousel.html',
+@View({
+  templateUrl: './samples/carousel/demo-carousel.html',
   directives: [If, Carousel, CarouselSlide, CarouselCaption]
 })
 export class DemoCarousel {

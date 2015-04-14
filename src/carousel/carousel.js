@@ -1,22 +1,22 @@
-import {Component, Template, Decorator, NgElement, Ancestor, For, onDestroy} from 'angular2/angular2';
+import {Component, View, Decorator, NgElement, Ancestor, For, onDestroy} from 'angular2/angular2';
 import {EventEmitter, PropertySetter} from 'angular2/src/core/annotations/di';
 
 @Component({
   selector: 'carousel',
-  bind : {
+  properties : {
     'index': 'index',
     'wrap': 'wrap',
     'interval': 'interval',
     'pause': 'pause',
     'noTransition': 'no-transition'
   },
-  events: {
+  hostListeners: {
     'mouseenter': 'toggleOnHover()',
     'mouseleave': 'toggleOnHover()'
   }
 })
-@Template({
-  url: './carousel/carousel.html',
+@View({
+  templateUrl: './carousel/carousel.html',
   directives: [For]
 })
 export class Carousel {
@@ -193,7 +193,8 @@ export class CarouselSlide {
     this.animate = (isToRight) => {isToRight ? leftSetter(true) : rightSetter(true)};
     this.cleanAfterAnimation = () => {leftSetter(false); rightSetter(false); nextSetter(false); prevSetter(false)};
 
-    var slideIndex = [].indexOf.call(this.el.parentNode.querySelectorAll('carousel-slide'), this.el);
+    //TODO later: var slideIndex = [].indexOf.call(this.el.parentNode.querySelectorAll('carousel-slide'), this.el);
+    var slideIndex = this.carousel.slides.length;
     carousel.registerSlide(this, slideIndex);
     itemSetter(true);
     roleSetter("listbox");
