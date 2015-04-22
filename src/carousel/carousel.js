@@ -1,5 +1,6 @@
 import {Component, View, Decorator, NgElement, Ancestor, For, onDestroy} from 'angular2/angular2';
-import {EventEmitter, PropertySetter} from 'angular2/src/core/annotations/di';
+import {PropertySetter} from 'angular2/src/core/annotations/di';
+import {EventEmitter, ObservableWrapper} from 'angular2/src/facade/async';
 
 @Component({
   selector: 'carousel',
@@ -13,19 +14,22 @@ import {EventEmitter, PropertySetter} from 'angular2/src/core/annotations/di';
   hostListeners: {
     'mouseenter': 'toggleOnHover()',
     'mouseleave': 'toggleOnHover()'
-  }
+  },
+  events: ['indexchange', 'slidestart', 'slideend']
 })
 @View({
   templateUrl: './carousel/carousel.html',
   directives: [For]
 })
 export class Carousel {
-  constructor(@EventEmitter('indexchange') indexChangeEmitter:Function,
-    @EventEmitter('slidestart') slidestartEmitter:Function,
-    @EventEmitter('slideend') slideendEmitter:Function) {
-    this.indexChangeEmitter = indexChangeEmitter;
-    this.slidestartEmitter = slidestartEmitter;
-    this.slideendEmitter = slideendEmitter;
+  indexchange: EventEmitter;
+  slidestart: EventEmitter;
+  slideend: EventEmitter;
+
+  constructor() {
+    this.indexchange = new EventEmitter();
+    this.slidestart = new EventEmitter();
+    this.slideend = new EventEmitter();
     this.activeIndex = -1;
     this.slides = [];
     this.wrap = true;
@@ -44,7 +48,7 @@ export class Carousel {
       if (this._isToRight == null) {
         this._isToRight = newValue > this.activeIndex;
       }
-      this.slidestartEmitter();
+      this.slidestart.next()
       var currentSlide = this.slides[this.activeIndex];
       var nextSlide = this.slides[newValue];
       if (this.activeIndex == -1) {
@@ -75,8 +79,8 @@ export class Carousel {
     this.activeIndex = parseInt(newValue);
     this._isChangingSlide = false;
     this._isToRight = null;
-    this.slideendEmitter();
-    this.indexChangeEmitter(this.activeIndex);
+    this.slideend.next();
+    this.indexchange.next(this.activeIndex);
   }
   set interval(newValue) {
     this._interval = newValue;
@@ -90,7 +94,7 @@ export class Carousel {
       var newIndex = this.slides.indexOf(activeSlide);
       if (newIndex != this.activeIndex) {
         this.activeIndex = newIndex;
-        this.indexChangeEmitter(this.activeIndex);
+        this.indexchange.next(this.activeIndex);
       }
     }
     this._resetAfterSlidesChange();
@@ -172,6 +176,9 @@ export class Carousel {
         this._startCycling();
       }
     }
+  }
+  _fireEvent(msg: string, value: any) {
+    ObservableWrapper.callNext(this.eventEmitter, msg, value);
   }
 }
 
