@@ -2,7 +2,7 @@ System.register("samples/carousel/demo-carousel", ["angular2/angular2", "carouse
   "use strict";
   var __moduleName = "samples/carousel/demo-carousel";
   var Component,
-      Template,
+      View,
       If,
       Carousel,
       CarouselSlide,
@@ -10,8 +10,8 @@ System.register("samples/carousel/demo-carousel", ["angular2/angular2", "carouse
       DemoCarousel;
   return {
     setters: [function($__m) {
-      Component = $__m.Component;
-      Template = $__m.Template;
+      Component = $__m.ComponentAnnotation;
+      View = $__m.ViewAnnotation;
       If = $__m.If;
     }, function($__m) {
       Carousel = $__m.Carousel;
@@ -19,15 +19,15 @@ System.register("samples/carousel/demo-carousel", ["angular2/angular2", "carouse
       CarouselCaption = $__m.CarouselCaption;
     }],
     execute: function() {
-      DemoCarousel = $__export("DemoCarousel", (function() {
-        var DemoCarousel = function DemoCarousel() {
+      DemoCarousel = (function() {
+        function DemoCarousel() {
           this.slideIndex = 1;
           this.slideWrap = true;
           this.slideInterval = 5000;
           this.slidePause = "hover";
           this.slideNoTransition = false;
           this.extraSlides = false;
-        };
+        }
         return ($traceurRuntime.createClass)(DemoCarousel, {
           onIndexFieldChange: function(event) {
             this.slideIndex = event.target.value;
@@ -53,10 +53,11 @@ System.register("samples/carousel/demo-carousel", ["angular2/angular2", "carouse
           onSlideStart: function() {},
           onSlideEnd: function() {}
         }, {});
-      }()));
+      }());
+      $__export("DemoCarousel", DemoCarousel);
       Object.defineProperty(DemoCarousel, "annotations", {get: function() {
-          return [new Component({selector: 'demo-carousel'}), new Template({
-            url: './samples/carousel/demo-carousel.html',
+          return [new Component({selector: 'demo-carousel'}), new View({
+            templateUrl: './samples/carousel/demo-carousel.html',
             directives: [If, Carousel, CarouselSlide, CarouselCaption]
           })];
         }});

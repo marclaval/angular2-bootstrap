@@ -2,22 +2,21 @@ System.register("samples/carousel/doc-carousel", ["angular2/angular2"], function
   "use strict";
   var __moduleName = "samples/carousel/doc-carousel";
   var Component,
-      Template,
+      View,
       DocCarousel;
   return {
     setters: [function($__m) {
-      Component = $__m.Component;
-      Template = $__m.Template;
+      Component = $__m.ComponentAnnotation;
+      View = $__m.ViewAnnotation;
     }],
     execute: function() {
-      DocCarousel = $__export("DocCarousel", (function() {
-        var DocCarousel = function DocCarousel() {
-          ;
-        };
+      DocCarousel = (function() {
+        function DocCarousel() {}
         return ($traceurRuntime.createClass)(DocCarousel, {}, {});
-      }()));
+      }());
+      $__export("DocCarousel", DocCarousel);
       Object.defineProperty(DocCarousel, "annotations", {get: function() {
-          return [new Component({selector: 'doc-carousel'}), new Template({url: './samples/carousel/README.html'})];
+          return [new Component({selector: 'doc-carousel'}), new View({templateUrl: './samples/carousel/README.html'})];
         }});
     }
   };

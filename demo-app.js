@@ -2,32 +2,34 @@ System.register("demo-app", ["angular2/angular2", "./samples/carousel/demo-carou
   "use strict";
   var __moduleName = "demo-app";
   var Component,
-      Template,
+      View,
+      bootstrap,
       DemoCarousel,
       DocCarousel,
       DemoApp;
   return {
     setters: [function($__m) {
-      Component = $__m.Component;
-      Template = $__m.Template;
+      Component = $__m.ComponentAnnotation;
+      View = $__m.ViewAnnotation;
+      bootstrap = $__m.bootstrap;
     }, function($__m) {
       DemoCarousel = $__m.DemoCarousel;
     }, function($__m) {
       DocCarousel = $__m.DocCarousel;
     }],
     execute: function() {
-      DemoApp = $__export("DemoApp", (function() {
-        var DemoApp = function DemoApp() {
-          ;
-        };
+      DemoApp = (function() {
+        function DemoApp() {}
         return ($traceurRuntime.createClass)(DemoApp, {}, {});
-      }()));
+      }());
+      $__export("DemoApp", DemoApp);
       Object.defineProperty(DemoApp, "annotations", {get: function() {
-          return [new Component({selector: 'demo-app'}), new Template({
-            url: 'demo-app.html',
+          return [new Component({selector: 'demo-app'}), new View({
+            templateUrl: 'demo-app.html',
             directives: [DemoCarousel, DocCarousel]
           })];
         }});
+      bootstrap(DemoApp);
     }
   };
 });
