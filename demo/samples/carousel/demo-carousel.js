@@ -1,4 +1,4 @@
-import {Component, View, If} from 'angular2/angular2';
+import {ComponentAnnotation as Component, ViewAnnotation as View, If} from 'angular2/angular2';
 import {Carousel, CarouselSlide, CarouselCaption} from 'carousel/carousel';
 
 @Component({

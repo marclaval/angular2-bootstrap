@@ -1,5 +1,4 @@
-import {Component, View, Decorator, NgElement, Ancestor, For, onDestroy} from 'angular2/angular2';
-import {PropertySetter} from 'angular2/src/core/annotations/di';
+import {ComponentAnnotation as Component, ViewAnnotation as View, DirectiveAnnotation as Directive, ElementRef, AncestorAnnotation as Ancestor, For, onDestroy} from 'angular2/angular2';
 import {EventEmitter, ObservableWrapper} from 'angular2/src/facade/async';
 
 @Component({
@@ -182,29 +181,35 @@ export class Carousel {
   }
 }
 
-@Decorator({
+@Directive({
   selector: 'carousel-slide',
-  lifecycle: [onDestroy]
+  lifecycle: [onDestroy],
+  hostProperties: {
+    
+    'itemClass': 'class.item',
+    'activeClass': 'class.active',
+    'leftClass': 'class.left',
+    'rightClass': 'class.right',
+    'prevClass': 'class.prev',
+    'nextClass': 'class.next',
+    'roleAttribute': 'attr.role'
+  }
 })
 export class CarouselSlide {
-  constructor(el: NgElement, @Ancestor() carousel: Carousel,
-    @PropertySetter('class.active') activeSetter: Function, @PropertySetter('class.item') itemSetter: Function,
-    @PropertySetter('class.left') leftSetter: Function, @PropertySetter('class.right') rightSetter: Function,
-    @PropertySetter('class.prev') prevSetter: Function, @PropertySetter('class.next') nextSetter: Function,
-    @PropertySetter('attr.role') roleSetter: Function) {
+  constructor(el: ElementRef, @Ancestor() carousel: Carousel) {
     this.carousel = carousel;
     this.el = el.domElement;
-    this.activate = () => {activeSetter(true)};
-    this.deactivate = () => {activeSetter(false)};
-    this.prepareAnimation = (isToRight) => {isToRight ? nextSetter(true) : prevSetter(true)};
-    this.animate = (isToRight) => {isToRight ? leftSetter(true) : rightSetter(true)};
-    this.cleanAfterAnimation = () => {leftSetter(false); rightSetter(false); nextSetter(false); prevSetter(false)};
+    this.activate = () => {this.activeClass = true};
+    this.deactivate = () => {this.activeClass = false};
+    this.prepareAnimation = (isToRight) => {isToRight ? this.nextClass = true : this.prevClass = true};
+    this.animate = (isToRight) => {isToRight ? this.leftClass = true : this.rightClass = true};
+    this.cleanAfterAnimation = () => {this.leftClass = false; this.rightClass = false; this.nextClass = false; this.prevClass = false};
 
     //TODO later: var slideIndex = [].indexOf.call(this.el.parentNode.querySelectorAll('carousel-slide'), this.el);
     var slideIndex = this.carousel.slides.length;
     carousel.registerSlide(this, slideIndex);
-    itemSetter(true);
-    roleSetter("listbox");
+    this.itemClass = true;
+    this.roleAttribute = "listbox";
   }
   getElement() {
     return this.el;
@@ -214,12 +219,15 @@ export class CarouselSlide {
   }
 }
 
-@Decorator({
-  selector: 'carousel-caption'
+@Directive({
+  selector: 'carousel-caption',
+  hostProperties: {
+    'carouselCaptionClass': 'class.carousel-caption'
+  }
 })
 export class CarouselCaption {
-  constructor(@PropertySetter('class.carousel-caption') captionSetter: Function) {
-    captionSetter(true);
+  constructor() {
+    this.carouselCaptionClass = true;
   }
 }
 

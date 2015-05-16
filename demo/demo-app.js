@@ -1,4 +1,4 @@
-import {Component, View, bootstrap} from 'angular2/angular2';
+import {ComponentAnnotation as Component, ViewAnnotation as View, bootstrap} from 'angular2/angular2';
 import {DemoCarousel} from './samples/carousel/demo-carousel'
 import {DocCarousel} from './samples/carousel/doc-carousel'
 
