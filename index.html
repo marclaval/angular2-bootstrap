@@ -14,6 +14,7 @@
         register(System);
     </script>
     <!-- Angular2-related imports -->
+    <script src="lib/shim_for_IE.js"></script>
     <script src="lib/Reflect.js"></script>
     <script src="lib/zone.js"></script>
     <script src="lib/long-stack-trace-zone.js"></script>
@@ -27,7 +28,7 @@
 
 <!-- Application bootstrap logic -->
 <script>
-    System.import('demo-app').catch(console.log.bind(console));
+    System.import('demo-app').catch(Function.prototype.bind.call(console.log, console));
 </script>
 
 </html>
