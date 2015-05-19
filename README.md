@@ -1,33 +1,16 @@
-!!! Work in progress !!!
+!!! This is a sandbox repo, not a real project (yet)!!!
 ========================
 
-Angular2 directives for Bootstrap.  
 Project started from: https://github.com/pkozlowski-opensource/ng2-play  
+But it may contain modified versions of the libraries (angular2, zone.js, ...)
   
 **Demo available here:** http://mlaval.github.io/angular2-bootstrap/  
-  
-Already implemented:  
- - Carousel
-
-To be implemented:
- - Togglable tabs
- - Alert messages
- - Dropdown
- - Modal
- - ScrollSpy
- - Tooltips
- - Popovers 
- - Buttons
- - Collapse
- - Affix
- - Autocomplete
- - Date picker
 
 ## Development
 
 ### Preparing your environment
 
-- install Gulp  globally: `npm install -g gulp`
+- install Gulp  globally: `npm install -g gulp protractor`
 - install local npm modules: `npm install`
 
 ### Running scripts
@@ -56,3 +39,7 @@ To use the project in **production** mode:
 To clean all files created during builds:
 
 - run `gulp clean`
+
+To run end to end tests:
+
+- run `protractor`
