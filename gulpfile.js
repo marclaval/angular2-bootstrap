@@ -79,6 +79,9 @@ gulp.task('angular2', function () {
     meta: {
       'rx': {
         format: 'cjs'
+      },
+      'angular2/src/core/compiler/interfaces': {
+        format: 'cjs' //https://github.com/angular/angular/commit/83e99fc72d5f6aa80f044bcf54f8679b2370dab7
       }
     }
   };

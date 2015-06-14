@@ -1,4 +1,4 @@
-import {ComponentAnnotation as Component, ViewAnnotation as View, If} from 'angular2/angular2';
+import {ComponentAnnotation as Component, ViewAnnotation as View, NgIf} from 'angular2/angular2';
 import {Carousel, CarouselSlide, CarouselCaption} from 'carousel/carousel';
 
 @Component({
@@ -6,7 +6,7 @@ import {Carousel, CarouselSlide, CarouselCaption} from 'carousel/carousel';
 })
 @View({
   templateUrl: './samples/carousel/demo-carousel.html',
-  directives: [If, Carousel, CarouselSlide, CarouselCaption]
+  directives: [NgIf, Carousel, CarouselSlide, CarouselCaption]
 })
 export class DemoCarousel {
   constructor() {

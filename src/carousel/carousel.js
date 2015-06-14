@@ -1,4 +1,4 @@
-import {ComponentAnnotation as Component, ViewAnnotation as View, DirectiveAnnotation as Directive, ElementRef, AncestorAnnotation as Ancestor, For, onDestroy} from 'angular2/angular2';
+import {ComponentAnnotation as Component, ViewAnnotation as View, DirectiveAnnotation as Directive, ElementRef, AncestorAnnotation as Ancestor, NgFor, onDestroy} from 'angular2/angular2';
 import {EventEmitter, ObservableWrapper} from 'angular2/src/facade/async';
 
 @Component({
@@ -18,7 +18,7 @@ import {EventEmitter, ObservableWrapper} from 'angular2/src/facade/async';
 })
 @View({
   templateUrl: './carousel/carousel.html',
-  directives: [For]
+  directives: [NgFor]
 })
 export class Carousel {
   indexchange: EventEmitter;
@@ -29,7 +29,7 @@ export class Carousel {
     this.indexchange = new EventEmitter();
     this.slidestart = new EventEmitter();
     this.slideend = new EventEmitter();
-    this.activeIndex = -1;
+    this.activeIndex = 0;
     this.slides = [];
     this.wrap = true;
     this._interval = 5000;
