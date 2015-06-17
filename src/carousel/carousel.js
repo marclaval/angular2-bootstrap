@@ -3,16 +3,16 @@ import {EventEmitter, ObservableWrapper} from 'angular2/src/facade/async';
 
 @Component({
   selector: 'carousel',
-  properties : {
-    'index': 'index',
-    'wrap': 'wrap',
-    'interval': 'interval',
-    'pause': 'pause',
-    'noTransition': 'no-transition'
-  },
-  hostListeners: {
-    'mouseenter': 'toggleOnHover()',
-    'mouseleave': 'toggleOnHover()'
+  properties : [
+    'index',
+    'wrap:',
+    'interval',
+    'pause',
+    'noTransition: no-transition'
+  ],
+  host: {
+    '(mouseenter)': 'toggleOnHover()',
+    '(mouseleave)': 'toggleOnHover()'
   },
   events: ['indexchange', 'slidestart', 'slideend']
 })
@@ -29,7 +29,7 @@ export class Carousel {
     this.indexchange = new EventEmitter();
     this.slidestart = new EventEmitter();
     this.slideend = new EventEmitter();
-    this.activeIndex = 0;
+    this.activeIndex = -1;
     this.slides = [];
     this.wrap = true;
     this._interval = 5000;
@@ -184,15 +184,14 @@ export class Carousel {
 @Directive({
   selector: 'carousel-slide',
   lifecycle: [onDestroy],
-  hostProperties: {
-    
-    'itemClass': 'class.item',
-    'activeClass': 'class.active',
-    'leftClass': 'class.left',
-    'rightClass': 'class.right',
-    'prevClass': 'class.prev',
-    'nextClass': 'class.next',
-    'roleAttribute': 'attr.role'
+  host: {
+    '[class.item]': 'itemClass',
+    '[class.active]': 'activeClass',
+    '[class.left]': 'leftClass',
+    '[class.right]': 'rightClass',
+    '[class.prev]': 'prevClass',
+    '[class.next]': 'nextClass',
+    'role': 'listbox'
   }
 })
 export class CarouselSlide {
@@ -209,7 +208,6 @@ export class CarouselSlide {
     var slideIndex = this.carousel.slides.length;
     carousel.registerSlide(this, slideIndex);
     this.itemClass = true;
-    this.roleAttribute = "listbox";
   }
   getElement() {
     return this.el;
@@ -221,8 +219,8 @@ export class CarouselSlide {
 
 @Directive({
   selector: 'carousel-caption',
-  hostProperties: {
-    'carouselCaptionClass': 'class.carousel-caption'
+  host: {
+    '[class.carousel-caption]': 'carouselCaptionClass'
   }
 })
 export class CarouselCaption {

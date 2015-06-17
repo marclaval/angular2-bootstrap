@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/mlaval/angular2-bootstrap/issues"
   },
-  "homepage": "https://github.com/mlaval/angular2-bootstrap/ng2-play",
+  "homepage": "https://github.com/mlaval/angular2-bootstrap",
   "devDependencies": {
     "connect": "^3.3.4",
     "del": "~1.1.1",
@@ -29,7 +29,7 @@
     "through2": "~0.6.3"
   },
   "dependencies": {
-    "angular2": "2.0.0-alpha.26",
+    "angular2": "2.0.0-alpha.27",
     "es6-module-loader": "0.16.5",
     "systemjs": "0.16.7",
     "reflect-metadata": "^0.1.0"
