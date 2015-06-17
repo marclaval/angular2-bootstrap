@@ -1,8 +1,7 @@
-!!! This is a sandbox repo, not a real project (yet)!!!
+!!! Work in progress !!!
 ========================
 
 Project started from: https://github.com/pkozlowski-opensource/ng2-play  
-But it may contain modified versions of the libraries (angular2, zone.js, ...)
   
 **Demo available here:** http://mlaval.github.io/angular2-bootstrap/  
 
@@ -10,7 +9,8 @@ But it may contain modified versions of the libraries (angular2, zone.js, ...)
 
 ### Preparing your environment
 
-- install Gulp  globally: `npm install -g gulp protractor`
+- install Gulp and Protractor globally: `npm install -g gulp protractor`
+- update the webdriver: `webdriver-manager update`
 - install local npm modules: `npm install`
 
 ### Running scripts
@@ -41,5 +41,5 @@ To clean all files created during builds:
 - run `gulp clean`
 
 To run end to end tests:
-
-- run `protractor`
+- run `gulp play` in a first terminal,
+- then run `protractor` in a second one
