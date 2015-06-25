@@ -6,7 +6,7 @@
       <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
     </carousel-caption>
   </carousel-slide>
-  <carousel-slide *if="extraSlides">
+  <carousel-slide *ng-if="extraSlides">
     <img style="width: 800px; height: 400px;" src="http://placekitten.com/800/399">
   </carousel-slide>
   <carousel-slide>
@@ -15,7 +15,7 @@
   <carousel-slide>
     <img style="width: 800px; height: 400px;" src="http://placekitten.com/800/401">
   </carousel-slide>
-  <carousel-slide *if="extraSlides">
+  <carousel-slide *ng-if="extraSlides">
     <img style="width: 800px; height: 400px;" src="http://placekitten.com/800/402">
   </carousel-slide>
 </carousel>

@@ -3,7 +3,7 @@ System.register("samples/carousel/demo-carousel", ["angular2/angular2", "carouse
   var __moduleName = "samples/carousel/demo-carousel";
   var Component,
       View,
-      If,
+      NgIf,
       Carousel,
       CarouselSlide,
       CarouselCaption,
@@ -12,14 +12,14 @@ System.register("samples/carousel/demo-carousel", ["angular2/angular2", "carouse
     setters: [function($__m) {
       Component = $__m.ComponentAnnotation;
       View = $__m.ViewAnnotation;
-      If = $__m.If;
+      NgIf = $__m.NgIf;
     }, function($__m) {
       Carousel = $__m.Carousel;
       CarouselSlide = $__m.CarouselSlide;
       CarouselCaption = $__m.CarouselCaption;
     }],
     execute: function() {
-      DemoCarousel = (function() {
+      DemoCarousel = function() {
         function DemoCarousel() {
           this.slideIndex = 1;
           this.slideWrap = true;
@@ -53,12 +53,12 @@ System.register("samples/carousel/demo-carousel", ["angular2/angular2", "carouse
           onSlideStart: function() {},
           onSlideEnd: function() {}
         }, {});
-      }());
+      }();
       $__export("DemoCarousel", DemoCarousel);
       Object.defineProperty(DemoCarousel, "annotations", {get: function() {
           return [new Component({selector: 'demo-carousel'}), new View({
             templateUrl: './samples/carousel/demo-carousel.html',
-            directives: [If, Carousel, CarouselSlide, CarouselCaption]
+            directives: [NgIf, Carousel, CarouselSlide, CarouselCaption]
           })];
         }});
     }

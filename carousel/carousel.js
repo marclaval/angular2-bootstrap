@@ -6,7 +6,7 @@ System.register("carousel/carousel", ["angular2/angular2", "angular2/src/facade/
       Directive,
       ElementRef,
       Ancestor,
-      For,
+      NgFor,
       onDestroy,
       EventEmitter,
       ObservableWrapper,
@@ -35,14 +35,14 @@ System.register("carousel/carousel", ["angular2/angular2", "angular2/src/facade/
       Directive = $__m.DirectiveAnnotation;
       ElementRef = $__m.ElementRef;
       Ancestor = $__m.AncestorAnnotation;
-      For = $__m.For;
+      NgFor = $__m.NgFor;
       onDestroy = $__m.onDestroy;
     }, function($__m) {
       EventEmitter = $__m.EventEmitter;
       ObservableWrapper = $__m.ObservableWrapper;
     }],
     execute: function() {
-      Carousel = (function() {
+      Carousel = function() {
         function Carousel() {
           this.indexchange = new EventEmitter();
           this.slidestart = new EventEmitter();
@@ -73,15 +73,15 @@ System.register("carousel/carousel", ["angular2/angular2", "angular2/src/facade/
                 this._finalizeTransition(null, nextSlide, newValue);
               } else if (!this.noTransition && this.transitionEnd && currentSlide) {
                 nextSlide.prepareAnimation(this._isToRight);
-                setTimeout((function() {
+                setTimeout(function() {
                   currentSlide.animate($__0._isToRight);
                   nextSlide.animate($__0._isToRight);
-                  var endAnimationCallback = (function(event) {
+                  var endAnimationCallback = function(event) {
                     currentSlide.getElement().removeEventListener($__0.transitionEnd, endAnimationCallback, false);
                     $__0._finalizeTransition(currentSlide, nextSlide, newValue);
-                  });
+                  };
                   currentSlide.getElement().addEventListener($__0.transitionEnd, endAnimationCallback, false);
-                }), 30);
+                }, 30);
               } else {
                 this._finalizeTransition(currentSlide, nextSlide, newValue);
               }
@@ -176,9 +176,9 @@ System.register("carousel/carousel", ["angular2/angular2", "angular2/src/facade/
           _startCycling: function() {
             var $__0 = this;
             if (this._interval >= 0) {
-              this.timerId = setInterval((function() {
+              this.timerId = setInterval(function() {
                 $__0.next();
-              }), this._interval > 600 ? this._interval : 600);
+              }, this._interval > 600 ? this._interval : 600);
             }
           },
           _stopCycling: function() {
@@ -200,26 +200,20 @@ System.register("carousel/carousel", ["angular2/angular2", "angular2/src/facade/
             ObservableWrapper.callNext(this.eventEmitter, msg, value);
           }
         }, {});
-      }());
+      }();
       $__export("Carousel", Carousel);
       Object.defineProperty(Carousel, "annotations", {get: function() {
           return [new Component({
             selector: 'carousel',
-            properties: {
-              'index': 'index',
-              'wrap': 'wrap',
-              'interval': 'interval',
-              'pause': 'pause',
-              'noTransition': 'no-transition'
-            },
-            hostListeners: {
-              'mouseenter': 'toggleOnHover()',
-              'mouseleave': 'toggleOnHover()'
+            properties: ['index', 'wrap', 'interval', 'pause', 'noTransition: no-transition'],
+            host: {
+              '(mouseenter)': 'toggleOnHover()',
+              '(mouseleave)': 'toggleOnHover()'
             },
             events: ['indexchange', 'slidestart', 'slideend']
           }), new View({
             templateUrl: './carousel/carousel.html',
-            directives: [For]
+            directives: [NgFor]
           })];
         }});
       Object.defineProperty(Carousel.prototype.registerSlide, "parameters", {get: function() {
@@ -231,33 +225,32 @@ System.register("carousel/carousel", ["angular2/angular2", "angular2/src/facade/
       Object.defineProperty(Carousel.prototype._fireEvent, "parameters", {get: function() {
           return [[$traceurRuntime.type.string], [$traceurRuntime.type.any]];
         }});
-      CarouselSlide = (function() {
+      CarouselSlide = function() {
         function CarouselSlide(el, carousel) {
           var $__0 = this;
           this.carousel = carousel;
-          this.el = el.domElement;
-          this.activate = (function() {
+          this.el = el.nativeElement;
+          this.activate = function() {
             $__0.activeClass = true;
-          });
-          this.deactivate = (function() {
+          };
+          this.deactivate = function() {
             $__0.activeClass = false;
-          });
-          this.prepareAnimation = (function(isToRight) {
+          };
+          this.prepareAnimation = function(isToRight) {
             isToRight ? $__0.nextClass = true : $__0.prevClass = true;
-          });
-          this.animate = (function(isToRight) {
+          };
+          this.animate = function(isToRight) {
             isToRight ? $__0.leftClass = true : $__0.rightClass = true;
-          });
-          this.cleanAfterAnimation = (function() {
+          };
+          this.cleanAfterAnimation = function() {
             $__0.leftClass = false;
             $__0.rightClass = false;
             $__0.nextClass = false;
             $__0.prevClass = false;
-          });
+          };
           var slideIndex = this.carousel.slides.length;
           carousel.registerSlide(this, slideIndex);
           this.itemClass = true;
-          this.roleAttribute = "listbox";
         }
         return ($traceurRuntime.createClass)(CarouselSlide, {
           getElement: function() {
@@ -267,37 +260,37 @@ System.register("carousel/carousel", ["angular2/angular2", "angular2/src/facade/
             this.carousel.unregisterSlide(this);
           }
         }, {});
-      }());
+      }();
       $__export("CarouselSlide", CarouselSlide);
       Object.defineProperty(CarouselSlide, "annotations", {get: function() {
           return [new Directive({
             selector: 'carousel-slide',
             lifecycle: [onDestroy],
-            hostProperties: {
-              'itemClass': 'class.item',
-              'activeClass': 'class.active',
-              'leftClass': 'class.left',
-              'rightClass': 'class.right',
-              'prevClass': 'class.prev',
-              'nextClass': 'class.next',
-              'roleAttribute': 'attr.role'
+            host: {
+              '[class.item]': 'itemClass',
+              '[class.active]': 'activeClass',
+              '[class.left]': 'leftClass',
+              '[class.right]': 'rightClass',
+              '[class.prev]': 'prevClass',
+              '[class.next]': 'nextClass',
+              'role': 'listbox'
             }
           })];
         }});
       Object.defineProperty(CarouselSlide, "parameters", {get: function() {
           return [[ElementRef], [Carousel, new Ancestor()]];
         }});
-      CarouselCaption = (function() {
+      CarouselCaption = function() {
         function CarouselCaption() {
           this.carouselCaptionClass = true;
         }
         return ($traceurRuntime.createClass)(CarouselCaption, {}, {});
-      }());
+      }();
       $__export("CarouselCaption", CarouselCaption);
       Object.defineProperty(CarouselCaption, "annotations", {get: function() {
           return [new Directive({
             selector: 'carousel-caption',
-            hostProperties: {'carouselCaptionClass': 'class.carousel-caption'}
+            host: {'[class.carousel-caption]': 'carouselCaptionClass'}
           })];
         }});
     }

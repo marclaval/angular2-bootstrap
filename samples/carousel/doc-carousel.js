@@ -10,10 +10,10 @@ System.register("samples/carousel/doc-carousel", ["angular2/angular2"], function
       View = $__m.ViewAnnotation;
     }],
     execute: function() {
-      DocCarousel = (function() {
+      DocCarousel = function() {
         function DocCarousel() {}
         return ($traceurRuntime.createClass)(DocCarousel, {}, {});
-      }());
+      }();
       $__export("DocCarousel", DocCarousel);
       Object.defineProperty(DocCarousel, "annotations", {get: function() {
           return [new Component({selector: 'doc-carousel'}), new View({templateUrl: './samples/carousel/README.html'})];

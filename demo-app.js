@@ -18,10 +18,10 @@ System.register("demo-app", ["angular2/angular2", "./samples/carousel/demo-carou
       DocCarousel = $__m.DocCarousel;
     }],
     execute: function() {
-      DemoApp = (function() {
+      DemoApp = function() {
         function DemoApp() {}
         return ($traceurRuntime.createClass)(DemoApp, {}, {});
-      }());
+      }();
       $__export("DemoApp", DemoApp);
       Object.defineProperty(DemoApp, "annotations", {get: function() {
           return [new Component({selector: 'demo-app'}), new View({
