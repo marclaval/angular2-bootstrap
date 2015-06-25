@@ -5,7 +5,7 @@ import {EventEmitter, ObservableWrapper} from 'angular2/src/facade/async';
   selector: 'carousel',
   properties : [
     'index',
-    'wrap:',
+    'wrap',
     'interval',
     'pause',
     'noTransition: no-transition'
@@ -197,7 +197,7 @@ export class Carousel {
 export class CarouselSlide {
   constructor(el: ElementRef, @Ancestor() carousel: Carousel) {
     this.carousel = carousel;
-    this.el = el.domElement;
+    this.el = el.nativeElement;
     this.activate = () => {this.activeClass = true};
     this.deactivate = () => {this.activeClass = false};
     this.prepareAnimation = (isToRight) => {isToRight ? this.nextClass = true : this.prevClass = true};
