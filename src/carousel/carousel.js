@@ -1,4 +1,4 @@
-import {ComponentAnnotation as Component, ViewAnnotation as View, DirectiveAnnotation as Directive, ElementRef, Ancestor, NgFor, onDestroy} from 'angular2/angular2';
+import {Component, View, Directive, ElementRef, Query, QueryList, Ancestor, NgFor, onDestroy} from 'angular2/angular2';
 import {EventEmitter, ObservableWrapper} from 'angular2/src/facade/async';
 
 @Component({
@@ -24,8 +24,9 @@ export class Carousel {
   indexchange: EventEmitter;
   slidestart: EventEmitter;
   slideend: EventEmitter;
+  query: QueryList<CarouselSlide>;
 
-  constructor() {
+  constructor(@Query(CarouselSlide) query: QueryList) {
     this.indexchange = new EventEmitter();
     this.slidestart = new EventEmitter();
     this.slideend = new EventEmitter();
@@ -40,8 +41,12 @@ export class Carousel {
     this._isToRight = true;
     this._isChangingSlide = false;
     this._startCycling();
+    query.onChange(() => {
+      this.registerSlides(query);
+    });
   }
   set index(newValue) {
+    //Navigation a new index
     if (!this._isChangingSlide && newValue != this.activeIndex && newValue >= 0 && newValue <= this.slides.length - 1) {
       this._isChangingSlide = true;
       if (this._isToRight == null) {
@@ -50,9 +55,7 @@ export class Carousel {
       this.slidestart.next()
       var currentSlide = this.slides[this.activeIndex];
       var nextSlide = this.slides[newValue];
-      if (this.activeIndex == -1) {
-        this._finalizeTransition(null, nextSlide, newValue);
-      } else if (!this.noTransition && this.transitionEnd && currentSlide) {
+      if (!this.noTransition && this.transitionEnd && currentSlide) {
         nextSlide.prepareAnimation(this._isToRight);
         setTimeout(() => {
           currentSlide.animate(this._isToRight);
@@ -67,14 +70,20 @@ export class Carousel {
         this._finalizeTransition(currentSlide, nextSlide, newValue);
       }
     }
+    //Initial value
+    else if (this.activeIndex == -1) {
+      this._finalizeTransition(null, null, newValue);
+    }
   }
   _finalizeTransition(currentSlide, nextSlide, newValue) {
     if (currentSlide) {
       currentSlide.deactivate();
       currentSlide.cleanAfterAnimation();
     }
-    nextSlide.activate();
-    nextSlide.cleanAfterAnimation();
+    if (nextSlide) {
+      nextSlide.activate();
+      nextSlide.cleanAfterAnimation();
+    }
     this.activeIndex = parseInt(newValue);
     this._isChangingSlide = false;
     this._isToRight = null;
@@ -86,47 +95,27 @@ export class Carousel {
     this._stopCycling();
     this._startCycling();
   }
-  registerSlide(slide: Slide, slideIndex) {
+  registerSlides(slides: QueryList) {
     var activeSlide = this.slides[this.activeIndex];
-    this.slides.splice(slideIndex, 0, slide);
-    if (activeSlide) {
-      var newIndex = this.slides.indexOf(activeSlide);
-      if (newIndex != this.activeIndex) {
-        this.activeIndex = newIndex;
-        this.indexchange.next(this.activeIndex);
-      }
-    }
-    this._resetAfterSlidesChange();
-  }
-  unregisterSlide(slide: Slide) {
-    var index = this.slides.indexOf(slide);
-    if (index > -1) {
-      var activeSlide = this.slides[this.activeIndex];
+    this.slides = [];
+    var activationDone = false;
+    for (var slide of slides) {
       slide.deactivate();
       slide.cleanAfterAnimation();
-      this.slides.splice(index, 1);
-      if (activeSlide == slide) {
-        var activeIndex = this.activeIndex;
-        this.activeIndex = -1;
-        this.index = activeIndex < this.slides.length ? activeIndex : this.slides.length - 1;
-      } else {
-        var newIndex = this.slides.indexOf(activeSlide);
-        if (newIndex != this.activeIndex) {
-          this.activeIndex = newIndex;
-          this.indexChangeEmitter(this.activeIndex);
-        }
-      }
-    }
-    this._resetAfterSlidesChange();
-  }
-  _resetAfterSlidesChange() {
-    for (var i = 0; i < this.slides.length; i++) {
-      var slide = this.slides[i];
-      slide.deactivate();
-      slide.cleanAfterAnimation();
-      if (i == this.activeIndex) {
+      if (slide === activeSlide || (typeof activeSlide === "undefined" && this.activeIndex == this.slides.length)) {
         slide.activate();
+        if (this.activeIndex !== this.slides.length) {
+          this.activeIndex = this.slides.length;
+          this.indexchange.next(this.activeIndex);
+        }
+        activationDone = true;
       }
+      this.slides.push(slide);
+    }
+    if (!activationDone) {
+      this.slides[0].activate();
+      this.activeIndex = 0;
+      this.indexchange.next(this.activeIndex);
     }
     this._isChangingSlide = false;
     this._isToRight = null;
@@ -183,7 +172,6 @@ export class Carousel {
 
 @Directive({
   selector: 'carousel-slide',
-  lifecycle: [onDestroy],
   host: {
     '[class.item]': 'itemClass',
     '[class.active]': 'activeClass',
@@ -203,17 +191,10 @@ export class CarouselSlide {
     this.prepareAnimation = (isToRight) => {isToRight ? this.nextClass = true : this.prevClass = true};
     this.animate = (isToRight) => {isToRight ? this.leftClass = true : this.rightClass = true};
     this.cleanAfterAnimation = () => {this.leftClass = false; this.rightClass = false; this.nextClass = false; this.prevClass = false};
-
-    //TODO later: var slideIndex = [].indexOf.call(this.el.parentNode.querySelectorAll('carousel-slide'), this.el);
-    var slideIndex = this.carousel.slides.length;
-    carousel.registerSlide(this, slideIndex);
     this.itemClass = true;
   }
   getElement() {
     return this.el;
-  }
-  onDestroy() {
-    this.carousel.unregisterSlide(this);
   }
 }
 
