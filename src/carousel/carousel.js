@@ -1,4 +1,4 @@
-import {ComponentAnnotation as Component, ViewAnnotation as View, DirectiveAnnotation as Directive, ElementRef, AncestorAnnotation as Ancestor, NgFor, onDestroy} from 'angular2/angular2';
+import {ComponentAnnotation as Component, ViewAnnotation as View, DirectiveAnnotation as Directive, ElementRef, Ancestor, NgFor, onDestroy} from 'angular2/angular2';
 import {EventEmitter, ObservableWrapper} from 'angular2/src/facade/async';
 
 @Component({
