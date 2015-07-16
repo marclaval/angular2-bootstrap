@@ -1,7 +1,7 @@
 !!! Work in progress !!!
 ========================
 
-Project started from: https://github.com/pkozlowski-opensource/ng2-play  
+Project started from: https://github.com/mgechev/angular2-seed  
   
 **Demo available here:** http://mlaval.github.io/angular2-bootstrap/  
 
