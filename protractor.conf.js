@@ -8,5 +8,5 @@ exports.config = {
   onPrepare: function() {
   	browser.ignoreSynchronization = true;
   },
-  baseUrl: "http://localhost:9000/"
+  baseUrl: "http://localhost:5555/"
 };

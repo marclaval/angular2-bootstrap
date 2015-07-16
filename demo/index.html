@@ -3,31 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <base href="<%= APP_BASE %>">
     <title>Angular2 - Bootstrap</title>
-    <link rel="stylesheet" href="./demo.css">
-
-    <!-- ES6-related imports -->
-    <script src="lib/traceur-runtime.js"></script>
-    <script src="lib/es6-module-loader-sans-promises.src.js"></script>
-    <script src="lib/extension-register.js"></script>
-    <script>
-        register(System);
-    </script>
-    <!-- Angular2-related imports -->
-    <script src="lib/Reflect.js"></script>
-    <script src="lib/zone.js"></script>
-    <script src="lib/long-stack-trace-zone.js"></script>
-    <script src="lib/angular2.js"></script>
+    <!-- inject:css -->
+    <!-- endinject -->
 </head>
 <body>
     <demo-app>
         Loading...
     </demo-app>
-</body>
 
-<!-- Application bootstrap logic -->
-<script>
-    System.import('demo-app').catch(console.log.bind(console));
-</script>
+    <!-- inject:js -->
+    <!-- endinject -->
+
+    <script src="<%= APP_BASE %>init.js?v=<%= VERSION %>"></script>
+</body>
 
 </html>

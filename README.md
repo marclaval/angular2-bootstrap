@@ -1,7 +1,7 @@
 !!! Work in progress !!!
 ========================
 
-Project started from: https://github.com/pkozlowski-opensource/ng2-play  
+Project started from: https://github.com/mgechev/angular2-seed  
   
 **Demo available here:** http://mlaval.github.io/angular2-bootstrap/  
 
@@ -23,23 +23,18 @@ To run the tests:
 
 - run `gulp test`
 -->
-To use the project in **dev** mode:
+To use the project:
 
-- run `gulp` to build it
-- run `gulp play` to build it and start a webserver which watches source files at http://localhost:9000  
+- run `gulp build.dev` or `gulp build.prod` to build it into **dist** folder
+- run `gulp serve.dev` or `gulp.serve.prod` to build it and start a webserver which watches source files at http://localhost:5555  
 
 <!---
 - run `gulp play tdd` to work in the TDD mode (i.e. watch source files to build and run all tests)
-
-To use the project in **production** mode:
-
-- run `gulp` or `gulp package` to package it
-- run `gulp www` to package it and start a webserver at http://localhost:8080
 -->
 To clean all files created during builds:
 
 - run `gulp clean`
 
 To run end to end tests:
-- run `gulp play` in a first terminal,
+- run `gulp serve.dev` or `gulp.serve.prod` in a first terminal,
 - then run `protractor` in a second one
