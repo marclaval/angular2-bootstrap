@@ -4,7 +4,7 @@
       <li *ng-for="#slide of slides; #i=index" [class.active]="i == activeIndex" (click)="navigateTo(i)"></li>
     </ol>
     <div class="carousel-inner" role="listbox">
-      <content></content>
+      <ng-content></ng-content>
     </div>
     <a class="left carousel-control" role="button" (^click)="prev()" [hidden]="!hasPrev()">
       <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
