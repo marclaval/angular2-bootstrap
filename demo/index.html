@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-    <base href="<%= APP_BASE %>">
     <title>Angular2 - Bootstrap</title>
     <!-- inject:css -->
     <!-- endinject -->
@@ -16,7 +15,9 @@
     <!-- inject:js -->
     <!-- endinject -->
 
-    <script src="<%= APP_BASE %>init.js?v=<%= VERSION %>"></script>
+    <script>
+        System.import('demo-app').catch(console.log.bind(console));
+    </script>
 </body>
 
 </html>
