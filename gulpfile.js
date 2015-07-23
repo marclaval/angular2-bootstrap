@@ -16,7 +16,8 @@ var watch = require('gulp-watch');
 var Builder = require('systemjs-builder');
 var del = require('del');
 var fs = require('fs');
-var join = require('path').join;
+var path = require('path');
+var join = path.join;
 var runSequence = require('run-sequence');
 var series = require('stream-series');
 var through2 = require('through2');
@@ -37,7 +38,8 @@ var PATH = {
     },
     prod: {
       all: 'dist/prod',
-      lib: 'dist/prod/lib'
+      lib: 'dist/prod/lib',
+      ng2: 'angular2_and_all_libs.js'
     }
   },
   src: {
@@ -180,17 +182,32 @@ gulp.task('build.lib.prod', ['build.ng2.prod'], function () {
 
   return series(lib, ng2, router)
     .pipe(jsOnly)
-    .pipe(concat('lib.js'))
+    .pipe(concat(PATH.dest.prod.ng2))
     .pipe(uglify())
     .pipe(gulp.dest(PATH.dest.prod.lib));
 });
 
-gulp.task('build.js.tmp', function () {
+gulp.task('build.assets.tmp', function () {
+  var filterMD = filter('**/*.md');
+  var filterHTML = filter('**/*.html');
+  return gulp.src(PATH.src.html.concat(PATH.src.md))
+    .pipe(filterMD)
+    .pipe(markdown())
+    .pipe(convertTables())
+    .pipe(filterMD.restore())
+    .pipe(filterHTML)
+    .pipe(minifyHTML({ conditionals: true }))
+    .pipe(filterHTML.restore())
+    .pipe(gulp.dest('tmp'));
+});
+
+gulp.task('build.js.tmp', ['build.assets.tmp'], function () {
   var result = gulp.src(PATH.src.ts)
     .pipe(plumber())
     .pipe(tsc(tsProject));
 
   return result.js
+    .pipe(inlineTemplates())
     .pipe(gulp.dest('tmp'));
 });
 
@@ -201,17 +218,8 @@ gulp.task('build.js.prod', ['build.js.tmp'], function() {
 });
 
 gulp.task('build.assets.prod', ['build.js.prod'], function () {
-  var filterMD = filter('**/*.md');
-  var filterHTML = filter('**/*.html');
   var filterCSS = filter('**/*.css');
-  return gulp.src(PATH.src.html.concat(PATH.src.css.concat(PATH.src.md)))
-    .pipe(filterMD)
-    .pipe(markdown())
-    .pipe(convertTables())
-    .pipe(filterMD.restore())
-    .pipe(filterHTML)
-    .pipe(minifyHTML({ conditionals: true }))
-    .pipe(filterHTML.restore())
+  return gulp.src(PATH.src.css)
     .pipe(filterCSS)
     .pipe(minifyCSS())
     .pipe(filterCSS.restore())
@@ -219,7 +227,7 @@ gulp.task('build.assets.prod', ['build.js.prod'], function () {
 });
 
 gulp.task('build.index.prod', function() {
-  var target = gulp.src([join(PATH.dest.prod.lib, 'lib.js'),
+  var target = gulp.src([join(PATH.dest.prod.lib, PATH.dest.prod.ng2),
                          join(PATH.dest.prod.all, '**/*.css')], { read: false });
   return gulp.src('./demo/index.html')
     .pipe(inject(target, { transform: transformPath('prod') }))
@@ -287,6 +295,23 @@ function serveSPA(env) {
 function convertTables() {
     return through2.obj(function(file, encoding, done) {
         var content = String(file.contents).replace(/<table>/g, '<table class="table table-bordered">');
+        file.contents = new Buffer(content);
+        this.push(file);
+        done();
+    });
+}
+
+function inlineTemplates() {
+   return through2.obj(function(file, encoding, done) {
+        var content = String(file.contents);
+        var pathPrefix = __dirname + path.sep + 'tmp';
+        var re = new RegExp("templateUrl\\s*:\\s*(\'|\"|\`)([^\'\"\`]*)(\'|\"|\`)", "g");
+        var res = re.exec(content);
+        while (res) {
+          var tpl = fs.readFileSync(join(pathPrefix, res[2]), {encoding: 'utf8'}).replace(/\'/g, '\\\'');
+          content = content.replace(res[0], 'template: \'' + tpl + '\'');
+          res = re.exec(content);
+        }
         file.contents = new Buffer(content);
         this.push(file);
         done();
