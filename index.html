@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-    <base href="/angular2-bootstrap/">
     <title>Angular2 - Bootstrap</title>
     <!-- inject:css -->
-    <link rel="stylesheet" href="\angular2-bootstrap\demo.css?v=0.0.0">
+    <link rel="stylesheet" href="demo.css">
     <!-- endinject -->
 </head>
 <body>
@@ -15,10 +14,12 @@
     </demo-app>
 
     <!-- inject:js -->
-    <script src="\angular2-bootstrap\lib\lib.js?v=0.0.0"></script>
+    <script src="lib/angular2_and_all_libs.js"></script>
     <!-- endinject -->
 
-    <script src="/angular2-bootstrap/init.js?v=0.0.0"></script>
+    <script>
+        System.import('demo-app').catch(console.log.bind(console));
+    </script>
 </body>
 
 </html>
