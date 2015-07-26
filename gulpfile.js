@@ -15,7 +15,9 @@ var watch = require('gulp-watch');
 
 var Builder = require('systemjs-builder');
 var del = require('del');
+var exec = require('child_process').exec;
 var fs = require('fs');
+var karma = require('karma').server;
 var path = require('path');
 var join = path.join;
 var runSequence = require('run-sequence');
@@ -34,7 +36,8 @@ var PATH = {
       all: 'dist/dev',
       lib: 'dist/dev/lib',
       ng2: 'dist/dev/lib/angular2.js',
-      router: 'dist/dev/lib/router.js'
+      router: 'dist/dev/lib/router.js',
+      test: 'dist/dev/lib/test.js'
     },
     prod: {
       all: 'dist/prod',
@@ -47,6 +50,7 @@ var PATH = {
     css: ['demo/**/*.css'],
     md: ['demo/**/*.md'],
     ts: ['demo/**/*.ts', 'src/**/*.ts'],
+    test: ['test/**/*.ts'],
     // Order is quite important here for the HTML tag injection.
     lib: [
       './node_modules/angular2/node_modules/traceur/bin/traceur-runtime.js',
@@ -122,6 +126,7 @@ gulp.task('clean.tmp', function(done) {
 
 gulp.task('build.ng2.dev', function () {
   ng2Builder.build('angular2/router', PATH.dest.dev.router, {});
+  ng2Builder.build('angular2/test', PATH.dest.dev.test, {});
   return ng2Builder.build('angular2/angular2', PATH.dest.dev.ng2, {});
 });
 
@@ -131,7 +136,7 @@ gulp.task('build.lib.dev', ['build.ng2.dev'], function () {
 });
 
 gulp.task('build.js.dev', function () {
-  var result = gulp.src(PATH.src.ts)
+  var result = gulp.src(PATH.src.ts.concat(PATH.src.test))
     .pipe(plumber())
     .pipe(sourcemaps.init())
     .pipe(tsc(tsProject));
@@ -207,7 +212,7 @@ gulp.task('build.js.tmp', ['build.assets.tmp'], function () {
     .pipe(tsc(tsProject));
 
   return result.js
-    .pipe(inlineTemplates())
+    .pipe(inlineTemplates('tmp'))
     .pipe(gulp.dest('tmp'));
 });
 
@@ -245,8 +250,39 @@ gulp.task('build.prod', function (done) {
 
 // --------------
 // Test.
+gulp.task('karma-launch', function() {
+  karma.start({
+    configFile: join(__dirname, 'karma.conf.js')
+  });
+});
 
-// To be implemented.
+gulp.task('karma-run', function (done) {
+  runKarma('karma.conf.js', done);
+});
+
+gulp.task('build.app.test.minify', function () {
+  return gulp.src([PATH.dest.dev.all + '/**/*.html'])
+    .pipe(minifyHTML({ conditionals: true }))
+    .pipe(gulp.dest(PATH.dest.dev.all));
+});
+gulp.task('build.app.test.inline', function () {
+  return gulp.src([PATH.dest.dev.all + '/**/*.js', '!' + PATH.dest.dev.all + '/lib/*'])
+    .pipe(inlineTemplates(PATH.dest.dev.all))
+    .pipe(gulp.dest(PATH.dest.dev.all));
+});
+
+gulp.task('test', ['build.dev'], function (neverDone) {
+  runSequence(
+    'build.app.test.minify',
+    'build.app.test.inline',
+    'karma-launch',
+    function() {
+      watch(['./src/**', './test/**'], function() {
+        runSequence('build.app.dev', 'build.app.test.minify', 'build.app.test.inline', 'karma-run');
+      });
+    }
+  );
+});
 
 // --------------
 // Serve dev.
@@ -301,10 +337,10 @@ function convertTables() {
     });
 }
 
-function inlineTemplates() {
+function inlineTemplates(folder) {
    return through2.obj(function(file, encoding, done) {
         var content = String(file.contents);
-        var pathPrefix = __dirname + path.sep + 'tmp';
+        var pathPrefix = __dirname + path.sep + folder;
         var re = new RegExp("templateUrl\\s*:\\s*(\'|\"|\`)([^\'\"\`]*)(\'|\"|\`)", "g");
         var res = re.exec(content);
         while (res) {
@@ -316,4 +352,16 @@ function inlineTemplates() {
         this.push(file);
         done();
     });
+}
+
+function runKarma(configFile, done) {
+  var cmd = process.platform === 'win32' ? 'node_modules\\.bin\\karma run ' :
+                                           'node node_modules/.bin/karma run ';
+  cmd += configFile;
+  console.log(cmd);
+  exec(cmd, function(e, stdout) {
+    // ignore errors, we don't want to fail the build in the interactive (non-ci) mode
+    // karma server will print all test failures
+    done();
+  });
 }
