@@ -18,23 +18,19 @@ Project started from: https://github.com/mgechev/angular2-seed
 For jshint validation:
 
 - run `gulp checkstyle`
-
-To run the tests:
-
-- run `gulp test`
 -->
-To use the project:
-
+To build the project:
 - run `gulp build.dev` or `gulp build.prod` to build it into **dist** folder
+
+To start the demo application:
 - run `gulp serve.dev` or `gulp.serve.prod` to build it and start a webserver which watches source files at http://localhost:5555  
 
-<!---
-- run `gulp play tdd` to work in the TDD mode (i.e. watch source files to build and run all tests)
--->
-To clean all files created during builds:
-
-- run `gulp clean`
+To run unit tests and watch source files:
+- run `gulp test`
 
 To run end to end tests:
 - run `gulp serve.dev` or `gulp.serve.prod` in a first terminal,
 - then run `protractor` in a second one
+
+To clean all files created during builds:
+- run `gulp clean`
