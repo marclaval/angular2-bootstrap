@@ -9,7 +9,7 @@ Project started from: https://github.com/mgechev/angular2-seed
 
 ### Preparing your environment
 
-- install Gulp and Protractor globally: `npm install -g gulp protractor`
+- install Gulp and Protractor globally: `npm install -g gulp protractor tsd`
 - update the webdriver: `webdriver-manager update`
 - install local npm modules: `npm install`
 

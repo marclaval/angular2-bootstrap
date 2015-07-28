@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "description": "Angular2 directives for Bootstrap",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postinstall": "webdriver-manager update && tsd reinstall -so --config tsd.json",
+    "test": "gulp test"
   },
   "repository": {
     "type": "git",
