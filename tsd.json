@@ -22,9 +22,6 @@
     },
     "rx/rx-lite.d.ts": {
       "commit": "b2345aee407127928f247165c91e18bd7dc1a14a"
-    },
-    "systemjs/systemjs.d.ts": {
-      "commit": "b2345aee407127928f247165c91e18bd7dc1a14a"
     }
   }
 }

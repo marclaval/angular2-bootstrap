@@ -14,13 +14,12 @@ import {
   xit,
 } from 'angular2/test';
 import {Component, View} from 'angular2/angular2';
-import {DOM} from 'angular2/src/dom/dom_adapter';
-import {Carousel, CarouselSlide, CarouselCaption} from './carousel';
+import {Carousel, CarouselSlide, CarouselCaption} from 'src/carousel/carousel';
 
 export function main() {
   describe('Carousel', () => {
-    var cpt = null;
-    var el = null;
+    var cpt : Carousel = null;
+    var el : HTMLElement = null;
 
     function runTest(tcb, async, cb) {
       var html = `
@@ -43,12 +42,12 @@ export function main() {
 
     function testSlideActive(index) {
       var activeSlides = [];
-      var slides = DOM.querySelectorAll(el, 'carousel-slide');
+      var slides =  el.querySelectorAll('carousel-slide');
       expect(index).toBeLessThan(slides.length);
       for (var i = 0; i < slides.length; i++) {
-          if (slides[i].className.indexOf("active") > -1) {
-              activeSlides.push(i);
-          }            
+        if ((<HTMLElement>slides[i]).className.indexOf("active") > -1) {
+            activeSlides.push(i);
+        }            
       }
       expect(activeSlides.length).toEqual(1);
       expect(activeSlides[0]).toEqual(index);

@@ -1,5 +1,5 @@
 /// <reference path="../../typings/tsd.d.ts" />
-import {Component, View, Directive, ElementRef, Query, QueryList, NgFor, onDestroy, EventEmitter} from 'angular2/angular2';
+import {Component, View, Directive, ElementRef, Query, QueryList, NgFor, EventEmitter} from 'angular2/angular2';
 
 @Directive({
   selector: 'carousel-slide',
@@ -114,7 +114,7 @@ export class Carousel {
       if (this._isToRight == null) {
         this._isToRight = newValue > this.activeIndex;
       }
-      this.slidestart.next()
+      this.slidestart.next(null);
       var currentSlide = this.slides[this.activeIndex];
       var nextSlide = this.slides[newValue];
       if (!this.noTransition && this.transitionEnd && currentSlide) {
@@ -149,7 +149,7 @@ export class Carousel {
     this.activeIndex = parseInt(newValue);
     this._isChangingSlide = false;
     this._isToRight = null;
-    this.slideend.next();
+    this.slideend.next(null);
     this.indexchange.next(this.activeIndex);
   }
   set interval(newValue) {

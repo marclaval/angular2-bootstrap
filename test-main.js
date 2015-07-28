@@ -14,6 +14,7 @@ System.baseURL = '/base/';
 // So that we can import packages like `core/foo`, instead of `core/src/foo`.
 System.paths = {
   '*': '*.js',
+  'src/*': 'dist/dev/*.js',
   'angular2/angular2': 'dist/dev/lib/angular2.js',
   'angular2/router': 'dist/dev/lib/router.js'
 };
