@@ -8,15 +8,18 @@ var markdown = require('gulp-markdown');
 var minifyCSS = require('gulp-minify-css');
 var minifyHTML = require('gulp-minify-html');
 var plumber = require('gulp-plumber');
+var protractor = require('gulp-protractor').protractor;
 var sourcemaps = require('gulp-sourcemaps');
 var tsc = require('gulp-typescript');
 var uglify = require('gulp-uglify');
 var watch = require('gulp-watch');
+var webdriver_update = require('gulp-protractor').webdriver_update;
 
 var Builder = require('systemjs-builder');
 var del = require('del');
 var exec = require('child_process').exec;
 var fs = require('fs');
+var http = require('http');
 var karma = require('karma').server;
 var path = require('path');
 var join = path.join;
@@ -88,7 +91,7 @@ var tsProject = tsc.createProject('tsconfig.json', {
   typescript: require('typescript')
 });
 
-var port = 5555;
+var SERVER_PORT = 5555;
 
 // --------------
 // Clean.
@@ -284,6 +287,24 @@ gulp.task('test', ['build.dev'], function (neverDone) {
   );
 });
 
+var e2eServer = null;
+gulp.task('e2eServer', ['build.dev'], function (done) {
+  e2eServer = http.createServer(_startSPA('dev'));
+  e2eServer.listen(SERVER_PORT, done);
+});
+gulp.task('webdriver_update', webdriver_update);
+gulp.task('protractor', ['webdriver_update', 'e2eServer'], function (done) {
+    gulp.src(['test-e2e/**/*spec.js']).pipe(protractor({
+        args: ['--baseUrl', 'http://localhost:' + SERVER_PORT]
+    })).on('error', function(e) {
+        e2eServer.close();
+        done();
+    }).on('end', function() {
+        e2eServer.close();
+        done();
+    });
+});
+
 // --------------
 // Serve dev.
 gulp.task('serve.dev', ['build.dev'], function () {
@@ -322,10 +343,15 @@ function injectableDevAssetsRef() {
 }
 
 function serveSPA(env) {
-  var app = express().use(express.static(join(__dirname, PATH.dest[env].all)));
-  app.listen(port, function () {
-    openResource('http://localhost:' + port);
+  var app = _startSPA(env);
+  app.listen(SERVER_PORT, function () {
+    openResource('http://localhost:' + SERVER_PORT);
   });
+  
+}
+function _startSPA(env) {
+  var app = express().use(express.static(join(__dirname, PATH.dest[env].all)));
+  return app;
 }
 
 function convertTables() {
