@@ -384,7 +384,6 @@ function runKarma(configFile, done) {
   var cmd = process.platform === 'win32' ? 'node_modules\\.bin\\karma run ' :
                                            'node node_modules/.bin/karma run ';
   cmd += configFile;
-  console.log(cmd);
   exec(cmd, function(e, stdout) {
     // ignore errors, we don't want to fail the build in the interactive (non-ci) mode
     // karma server will print all test failures

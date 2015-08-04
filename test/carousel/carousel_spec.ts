@@ -35,7 +35,7 @@ export function main() {
           rootTC._componentParentView.changeDetector.detectChanges();
           cpt = rootTC.componentViewChildren[0].componentInstance;
           el = rootTC.componentViewChildren[0].nativeElement;       
-          cb(rootTC);
+          cb(rootTC, () => rootTC._componentParentView.changeDetector.detectChanges());
           async.done();
         });
     }
@@ -55,38 +55,38 @@ export function main() {
 
     it('should cycle forward', 
       inject([TestComponentBuilder, AsyncTestCompleter], (tcb, async) => {
-        runTest(tcb, async, (rootTC) => {
+        runTest(tcb, async, (rootTC, refresh) => {
           testSlideActive(0);
 
           cpt.next();
-          rootTC._componentParentView.changeDetector.detectChanges();
+          refresh();
           testSlideActive(1);
 
           cpt.next();
-          rootTC._componentParentView.changeDetector.detectChanges();
+          refresh();
           testSlideActive(2);
 
           cpt.next();
-          rootTC._componentParentView.changeDetector.detectChanges();
+          refresh();
           testSlideActive(0);
         });
       }));
 
     it('should cycle backward',
       inject([TestComponentBuilder, AsyncTestCompleter], (tcb: TestComponentBuilder, async) => {
-        runTest(tcb, async, (rootTC) => {      
+        runTest(tcb, async, (rootTC, refresh) => {      
           testSlideActive(0);
 
           cpt.prev();
-          rootTC._componentParentView.changeDetector.detectChanges();
+          refresh();
           testSlideActive(2);
 
           cpt.prev();
-          rootTC._componentParentView.changeDetector.detectChanges();
+          refresh();
           testSlideActive(1);
 
           cpt.prev();
-          rootTC._componentParentView.changeDetector.detectChanges();
+          refresh();
           testSlideActive(0);
         });
       }));

@@ -1,6 +1,6 @@
 <div class="carousel slide">
   <ol class="carousel-indicators">
-    <li *ng-for="#slide of slides; #i=index" [class.active]="i == activeIndex" (click)="navigateTo(i)"></li>
+    <li *ng-for="#slide of _slides; #i=index" [class.active]="i == _activeIndex" (click)="navigateTo(i)"></li>
   </ol>
   <div class="carousel-inner" role="listbox">
     <ng-content></ng-content>

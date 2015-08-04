@@ -4,39 +4,40 @@ import {Component, View, Directive, ElementRef, Query, QueryList, NgFor, EventEm
 @Directive({
   selector: 'carousel-slide',
   host: {
-    '[class.item]': 'itemClass',
-    '[class.active]': 'activeClass',
-    '[class.left]': 'leftClass',
-    '[class.right]': 'rightClass',
-    '[class.prev]': 'prevClass',
-    '[class.next]': 'nextClass',
+    '[class.item]': '_itemClass',
+    '[class.active]': '_activeClass',
+    '[class.left]': '_leftClass',
+    '[class.right]': '_rightClass',
+    '[class.prev]': '_prevClass',
+    '[class.next]': '_nextClass',
     'role': 'listbox'
   }
 })
 export class CarouselSlide {
-  el;
-  activate;
-  deactivate;
-  prepareAnimation;
-  animate;
-  cleanAfterAnimation;
-  itemClass;
-  activeClass;
-  leftClass;
-  rightClass;
-  prevClass;
-  nextClass;
+  private _el: HTMLElement;
+  private _itemClass: boolean = true;
+  private _activeClass: boolean;
+  private _leftClass: boolean;
+  private _rightClass: boolean;
+  private _prevClass: boolean;
+  private _nextClass: boolean;
+  
   constructor(el: ElementRef) {
-    this.el = el.nativeElement;
-    this.activate = () => {this.activeClass = true};
-    this.deactivate = () => {this.activeClass = false};
-    this.prepareAnimation = (isToRight) => {isToRight ? this.nextClass = true : this.prevClass = true};
-    this.animate = (isToRight) => {isToRight ? this.leftClass = true : this.rightClass = true};
-    this.cleanAfterAnimation = () => {this.leftClass = false; this.rightClass = false; this.nextClass = false; this.prevClass = false};
-    this.itemClass = true;
+    this._el = el.nativeElement;
   }
-  getElement() {
-    return this.el;
+  getElement(): HTMLElement {
+    return this._el;
+  }
+  activate(): void {this._activeClass = true;}
+  deactivate(): void {this._activeClass = false;}
+  prepareAnimation(isToRight: boolean): void {
+    isToRight ? this._nextClass = true : this._prevClass = true;
+  }
+  animate(isToRight: boolean): void {
+    isToRight ? this._leftClass = true : this._rightClass = true;
+  }
+  cleanAfterAnimation(): void {
+    this._leftClass = this._rightClass = this._nextClass = this._prevClass = false;
   }
 }
 
@@ -47,10 +48,7 @@ export class CarouselSlide {
   }
 })
 export class CarouselCaption {
-  carouselCaptionClass;
-  constructor() {
-    this.carouselCaptionClass = true;
-  }
+  private carouselCaptionClass: boolean = true;
 }
 
 @Component({
@@ -63,8 +61,8 @@ export class CarouselCaption {
     'noTransition: no-transition'
   ],
   host: {
-    '(mouseenter)': 'toggleOnHover()',
-    '(mouseleave)': 'toggleOnHover()'
+    '(mouseenter)': 'toggleAutomaticSliding()',
+    '(mouseleave)': 'toggleAutomaticSliding()'
   },
   events: ['indexchange', 'slidestart', 'slideend']
 })
@@ -73,71 +71,93 @@ export class CarouselCaption {
   directives: [NgFor]
 })
 export class Carousel {
-  indexchange: EventEmitter;
-  slidestart: EventEmitter;
-  slideend: EventEmitter;
-  query: QueryList<CarouselSlide>;
-  activeIndex;
-  slides;
-  wrap;
-  _interval;
-  pause;
-  timerId;
-  noTransition;
-  transitionEnd;
-  _isToRight;
-  _isChangingSlide;
+  noTransition: boolean = false;
+  pause: string = "hover";
+  wrap: boolean = true;
+  
+  private indexchange: EventEmitter = new EventEmitter();
+  private slidestart: EventEmitter = new EventEmitter();
+  private slideend: EventEmitter = new EventEmitter();
+  
+  private _activeIndex: number = -1;
+  private _interval: number = 5000;
+  private _isChangingSlide: boolean = false;
+  private _isToRight: boolean = true;
+  private _query: QueryList<CarouselSlide>;
+  private _slides: Array<CarouselSlide> = [];
+  private _timerId: number = null;
+  private _transitionEnd: string = getTransitionEnd();
 
   constructor(@Query(CarouselSlide) query: QueryList<CarouselSlide>) {
-    this.indexchange = new EventEmitter();
-    this.slidestart = new EventEmitter();
-    this.slideend = new EventEmitter();
-    this.activeIndex = -1;
-    this.slides = [];
-    this.wrap = true;
-    this._interval = 5000;
-    this.pause = "hover",
-    this.timerId = null;
-    this.noTransition = false;
-    this.transitionEnd = getTransitionEnd();
-    this._isToRight = true;
-    this._isChangingSlide = false;
     this._startCycling();
     query.onChange(() => {
-      this.registerSlides(query);
+      this._registerSlides(query);
     });
   }
-  set index(newValue) {
+  
+  private _registerSlides(query: QueryList<CarouselSlide>): void {
+    var activeSlide = this._slides[this._activeIndex];
+    this._slides = [];
+    var activationDone = false;
+    for (var i = 0; i < query.length; i++) {
+      var slide = query._results[i];
+      slide.deactivate();
+      slide.cleanAfterAnimation();
+      if (slide === activeSlide || (typeof activeSlide === "undefined" && this._activeIndex == this._slides.length)) {
+        slide.activate();
+        if (this._activeIndex !== this._slides.length) {
+          this._activeIndex = this._slides.length;
+          this.indexchange.next(this._activeIndex);
+        }
+        activationDone = true;
+      }
+      this._slides.push(slide);
+    }
+    if (!activationDone) {
+      this._slides[0].activate();
+      this._activeIndex = 0;
+      this.indexchange.next(this._activeIndex);
+    }
+    this._isChangingSlide = false;
+    this._isToRight = null;
+  }
+  
+  set interval(newValue: number) {
+    this._interval = newValue;
+    this._stopCycling();
+    this._startCycling();
+  }
+  set index(newValue: number) {
     //Navigation a new index
-    if (!this._isChangingSlide && newValue != this.activeIndex && newValue >= 0 && newValue <= this.slides.length - 1) {
+    if (!this._isChangingSlide && newValue != this._activeIndex && newValue >= 0 && newValue <= this._slides.length - 1) {
       this._isChangingSlide = true;
       if (this._isToRight == null) {
-        this._isToRight = newValue > this.activeIndex;
+        this._isToRight = newValue > this._activeIndex;
       }
       this.slidestart.next(null);
-      var currentSlide = this.slides[this.activeIndex];
-      var nextSlide = this.slides[newValue];
-      if (!this.noTransition && this.transitionEnd && currentSlide) {
+      var currentSlide = this._slides[this._activeIndex];
+      var nextSlide = this._slides[newValue];
+      if (!this.noTransition && this._transitionEnd && currentSlide) {
         nextSlide.prepareAnimation(this._isToRight);
         setTimeout(() => {
           currentSlide.animate(this._isToRight);
           nextSlide.animate(this._isToRight);
           var endAnimationCallback = (event) => {
-            currentSlide.getElement().removeEventListener(this.transitionEnd, endAnimationCallback, false);
+            currentSlide.getElement().removeEventListener(this._transitionEnd, endAnimationCallback, false);
             this._finalizeTransition(currentSlide, nextSlide, newValue);
           };
-          currentSlide.getElement().addEventListener(this.transitionEnd, endAnimationCallback, false);
+          currentSlide.getElement().addEventListener(this._transitionEnd, endAnimationCallback, false);
         }, 30);
       } else {
         this._finalizeTransition(currentSlide, nextSlide, newValue);
       }
     }
     //Initial value
-    else if (this.activeIndex == -1) {
+    else if (this._activeIndex == -1) {
       this._finalizeTransition(null, null, newValue);
     }
   }
-  _finalizeTransition(currentSlide, nextSlide, newValue) {
+  private _finalizeTransition(currentSlide: CarouselSlide, nextSlide: CarouselSlide, newValue: number): void {
     if (currentSlide) {
       currentSlide.deactivate();
       currentSlide.cleanAfterAnimation();
@@ -146,93 +166,64 @@ export class Carousel {
       nextSlide.activate();
       nextSlide.cleanAfterAnimation();
     }
-    this.activeIndex = parseInt(newValue);
+    this._activeIndex = newValue;
     this._isChangingSlide = false;
     this._isToRight = null;
     this.slideend.next(null);
-    this.indexchange.next(this.activeIndex);
+    this.indexchange.next(this._activeIndex);
   }
-  set interval(newValue) {
-    this._interval = newValue;
-    this._stopCycling();
-    this._startCycling();
-  }
-  registerSlides(slides: QueryList<CarouselSlide>) {
-    var activeSlide = this.slides[this.activeIndex];
-    this.slides = [];
-    var activationDone = false;
-    for (var i = 0; i < slides.length; i++) {
-      var slide = slides._results[i];
-      slide.deactivate();
-      slide.cleanAfterAnimation();
-      if (slide === activeSlide || (typeof activeSlide === "undefined" && this.activeIndex == this.slides.length)) {
-        slide.activate();
-        if (this.activeIndex !== this.slides.length) {
-          this.activeIndex = this.slides.length;
-          this.indexchange.next(this.activeIndex);
-        }
-        activationDone = true;
-      }
-      this.slides.push(slide);
-    }
-    if (!activationDone) {
-      this.slides[0].activate();
-      this.activeIndex = 0;
-      this.indexchange.next(this.activeIndex);
-    }
-    this._isChangingSlide = false;
-    this._isToRight = null;
-  }
-  navigateTo(newIndex) {
+  
+  navigateTo(newIndex: number): void {
     this.index = newIndex;
   }
-  prev() {
+  prev(): void {
     if (this.hasPrev()) {
-      var prevIndex = this.activeIndex - 1 < 0 ? this.slides.length - 1 : this.activeIndex - 1;
+      var prevIndex = this._activeIndex - 1 < 0 ? this._slides.length - 1 : this._activeIndex - 1;
       this._isToRight = false;
       this.index = prevIndex;
     }
   }
-  next() {
+  next(): void {
     if (this.hasNext()) {
-      var nextIndex = (this.activeIndex + 1) % this.slides.length;
+      var nextIndex = (this._activeIndex + 1) % this._slides.length;
       this._isToRight = true;
       this.index = nextIndex;
     }
   }
-  hasPrev() {
-    return this.slides.length > 1 &&  !(!this.wrap && this.activeIndex === 0);
+  hasPrev(): boolean {
+    return this._slides.length > 1 &&  !(!this.wrap && this._activeIndex === 0);
   }
-  hasNext() {
-    return this.slides.length > 1 && !(!this.wrap && this.activeIndex === (this.slides.length - 1));
+  hasNext(): boolean {
+    return this._slides.length > 1 && !(!this.wrap && this._activeIndex === (this._slides.length - 1));
   }
-  _startCycling() {
-    if (this._interval >= 0) {
-      this.timerId = setInterval(() => {
-        this.next();
-      }, this._interval > 600 ? this._interval: 600); //600ms is the transition duration defined in BS css
-    }
-  }
-  _stopCycling() {
-    if (this.timerId) {
-      clearInterval(this.timerId);
-    }
-    this.timerId = null;
-  }
-  toggleOnHover() {
+  toggleAutomaticSliding(): void {
     if (this.pause === "hover") {
-      if (this.timerId) {
+      if (this._timerId) {
         this._stopCycling();
       } else {
         this._startCycling();
       }
     }
   }
+  
+  private _startCycling(): void {
+    if (this._interval >= 0) {
+      this._timerId = setInterval(() => {
+        this.next();
+      }, this._interval > 600 ? this._interval: 600); //600ms is the transition duration defined in BS css
+    }
+  }
+  private _stopCycling(): void {
+    if (this._timerId) {
+      clearInterval(this._timerId);
+    }
+    this._timerId = null;
+  }
 }
 
 // CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
 // ============================================================
-function getTransitionEnd() {
+function getTransitionEnd(): string {
     var el = document.createElement('angular2-bootstrap');
     var transEndEventNames = {
         WebkitTransition : 'webkitTransitionEnd',
@@ -245,5 +236,5 @@ function getTransitionEnd() {
             return transEndEventNames[name];
         }
     }
-    return false;
+    return null;
 }
