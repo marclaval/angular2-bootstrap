@@ -1,5 +1,5 @@
 /// <reference path="../../typings/tsd.d.ts" />
-import {Component, View, Directive, ElementRef, Query, QueryList, NgFor, EventEmitter} from 'angular2/angular2';
+import {Component, View, Directive, ElementRef, Query, QueryList, NgFor, NgIf, EventEmitter} from 'angular2/angular2';
 
 @Directive({
   selector: 'carousel-slide',
@@ -68,12 +68,11 @@ export class CarouselCaption {
 })
 @View({
   templateUrl: './carousel/carousel.html',
-  directives: [NgFor]
+  directives: [NgFor, NgIf]
 })
 export class Carousel {
-  noTransition: boolean = false;
+  
   pause: string = "hover";
-  wrap: boolean = true;
   
   private indexchange: EventEmitter = new EventEmitter();
   private slidestart: EventEmitter = new EventEmitter();
@@ -83,10 +82,12 @@ export class Carousel {
   private _interval: number = 5000;
   private _isChangingSlide: boolean = false;
   private _isToRight: boolean = true;
+  private _noTransition: boolean = false;
   private _query: QueryList<CarouselSlide>;
   private _slides: Array<CarouselSlide> = [];
   private _timerId: number = null;
   private _transitionEnd: string = getTransitionEnd();
+  private  _wrap: boolean = true;
 
   constructor(@Query(CarouselSlide) query: QueryList<CarouselSlide>) {
     this._startCycling();
@@ -122,8 +123,14 @@ export class Carousel {
     this._isToRight = null;
   }
   
-  set interval(newValue: number) {
-    this._interval = newValue;
+  set wrap (newValue: boolean | string) {
+    this._wrap = typeof newValue === "string" ? newValue != "false" : newValue;
+  }
+  set noTransition (newValue: boolean | string) {
+    this._noTransition = typeof newValue === "string" ? newValue != "false" : newValue;
+  }
+  set interval(newValue: number | string) {
+    this._interval = typeof newValue === "string" ? parseInt(newValue) : newValue;
     this._stopCycling();
     this._startCycling();
   }
@@ -137,7 +144,7 @@ export class Carousel {
       this.slidestart.next(null);
       var currentSlide = this._slides[this._activeIndex];
       var nextSlide = this._slides[newValue];
-      if (!this.noTransition && this._transitionEnd && currentSlide) {
+      if (!this._noTransition && this._transitionEnd && currentSlide) {
         nextSlide.prepareAnimation(this._isToRight);
         setTimeout(() => {
           currentSlide.animate(this._isToRight);
@@ -191,10 +198,10 @@ export class Carousel {
     }
   }
   hasPrev(): boolean {
-    return this._slides.length > 1 &&  !(!this.wrap && this._activeIndex === 0);
+    return this._slides.length > 1 &&  !(!this._wrap && this._activeIndex === 0);
   }
   hasNext(): boolean {
-    return this._slides.length > 1 && !(!this.wrap && this._activeIndex === (this._slides.length - 1));
+    return this._slides.length > 1 && !(!this._wrap && this._activeIndex === (this._slides.length - 1));
   }
   toggleAutomaticSliding(): void {
     if (this.pause === "hover") {

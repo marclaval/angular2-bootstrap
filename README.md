@@ -28,7 +28,7 @@ To run unit tests and watch source files:
 - run `gulp test`
 
 To run end to end tests:
-- run `gulp protractor`
+- run `gulp e2e`
 
 To clean all files created during builds:
 - run `gulp clean`

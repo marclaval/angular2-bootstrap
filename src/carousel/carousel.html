@@ -1,15 +1,15 @@
 <div class="carousel slide">
-  <ol class="carousel-indicators">
+  <ol *ng-if="_slides.length > 1" class="carousel-indicators">
     <li *ng-for="#slide of _slides; #i=index" [class.active]="i == _activeIndex" (click)="navigateTo(i)"></li>
   </ol>
   <div class="carousel-inner" role="listbox">
     <ng-content></ng-content>
   </div>
-  <a class="left carousel-control" role="button" (^click)="prev()" [hidden]="!hasPrev()">
+  <a *ng-if="hasPrev()" class="left carousel-control" role="button" (^click)="prev()">
     <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
     <span class="sr-only">Previous</span>
   </a>
-  <a class="right carousel-control" role="button" (^click)="next()" [hidden]="!hasNext()">
+  <a *ng-if="hasNext()" class="right carousel-control" role="button" (^click)="next()">
     <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
     <span class="sr-only">Next</span>
   </a>

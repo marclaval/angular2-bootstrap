@@ -293,7 +293,7 @@ gulp.task('e2eServer', ['build.dev'], function (done) {
   e2eServer.listen(SERVER_PORT, done);
 });
 gulp.task('webdriver_update', webdriver_update);
-gulp.task('protractor', ['webdriver_update', 'e2eServer'], function (done) {
+gulp.task('e2e', ['webdriver_update', 'e2eServer'], function (done) {
     gulp.src(['test-e2e/**/*spec.js']).pipe(protractor({
         args: ['--baseUrl', 'http://localhost:' + SERVER_PORT]
     })).on('error', function(e) {

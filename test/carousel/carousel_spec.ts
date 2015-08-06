@@ -21,13 +21,12 @@ export function main() {
     var cpt : Carousel = null;
     var el : HTMLElement = null;
 
-    function runTest(tcb, async, cb) {
-      var html = `
-      <carousel index="0" no-transition="true">
-        <carousel-slide><div>1</div></carousel-slide>
-        <carousel-slide><div>2</div></carousel-slide>
-        <carousel-slide><div>3</div></carousel-slide>
-      </carousel>`;
+    function runTest({nbOfSlides = 3, index = 0, interval = 1000, noTransition = true, pause = "hover", wrap = true}, tcb, async, cb) {
+      var html = `<carousel index="${index}" interval="${noTransition}" no-transition="${noTransition}" pause="${pause}" wrap="${wrap}">`;
+      for (var i = 0; i < nbOfSlides; i++) {
+        html += `<carousel-slide><div>${i+1}</div></carousel-slide>`;
+      }
+      html += '</carousel>';
       tcb.overrideTemplate(TestComponent, html)
         .createAsync(TestComponent)
         .then((rootTC) => {
@@ -52,10 +51,71 @@ export function main() {
       expect(activeSlides.length).toEqual(1);
       expect(activeSlides[0]).toEqual(index);
     }
-
+    function getSlides() {return el.querySelectorAll('.item');}
+    function getLeftArrow() {return el.querySelectorAll('a.left');}
+    function getRightArrow() {return el.querySelectorAll('a.right');}
+    function getDots() {return el.querySelectorAll('ol.carousel-indicators > li');}
+    
+    it('should set the selected slide to index 1', 
+      inject([TestComponentBuilder, AsyncTestCompleter], (tcb, async) => {
+        runTest({}, tcb, async, (rootTC, refresh) => {
+          testSlideActive(0);
+          cpt.index = 1;
+          refresh();
+          testSlideActive(1);
+        });
+      }));
+      
+    it('should create prev & next navigation arrows', 
+      inject([TestComponentBuilder, AsyncTestCompleter], (tcb, async) => {
+        runTest({}, tcb, async, (rootTC, refresh) => {
+          expect(getLeftArrow().length).toEqual(1);
+          expect(getRightArrow().length).toEqual(1);
+        });
+      }));
+      
+    it('should create slide indicators', 
+      inject([TestComponentBuilder, AsyncTestCompleter], (tcb, async) => {
+        runTest({}, tcb, async, (rootTC, refresh) => {
+          expect(getDots().length).toEqual(3);
+        });
+      }));
+      
+    it('should hide navigation arrows when wrap is false', 
+      inject([TestComponentBuilder, AsyncTestCompleter], (tcb, async) => {
+        runTest({wrap: false}, tcb, async, (rootTC, refresh) => { 
+          expect(getLeftArrow().length).toEqual(0);
+          expect(getRightArrow().length).toEqual(1);
+          cpt.index = 2;
+          refresh();
+          expect(getLeftArrow().length).toEqual(1);
+          expect(getRightArrow().length).toEqual(0);
+        });
+      }));
+      
+    it('should hide navigation when only one slide', 
+      inject([TestComponentBuilder, AsyncTestCompleter], (tcb, async) => {
+        runTest({nbOfSlides: 1}, tcb, async, (rootTC, refresh) => { 
+          expect(getSlides().length).toEqual(1);
+          expect(getLeftArrow().length).toEqual(0);
+          expect(getRightArrow().length).toEqual(0);
+          expect(getDots().length).toEqual(0);
+        });
+      }));
+      
+    it('should not fail when no slides', 
+      inject([TestComponentBuilder, AsyncTestCompleter], (tcb, async) => {
+        runTest({nbOfSlides: 0}, tcb, async, (rootTC, refresh) => { 
+          expect(getSlides().length).toEqual(0);
+          expect(getLeftArrow().length).toEqual(0);
+          expect(getRightArrow().length).toEqual(0);
+          expect(getDots().length).toEqual(0);
+        });
+      }));
+          
     it('should cycle forward', 
       inject([TestComponentBuilder, AsyncTestCompleter], (tcb, async) => {
-        runTest(tcb, async, (rootTC, refresh) => {
+        runTest({}, tcb, async, (rootTC, refresh) => {
           testSlideActive(0);
 
           cpt.next();
@@ -74,7 +134,7 @@ export function main() {
 
     it('should cycle backward',
       inject([TestComponentBuilder, AsyncTestCompleter], (tcb: TestComponentBuilder, async) => {
-        runTest(tcb, async, (rootTC, refresh) => {      
+        runTest({}, tcb, async, (rootTC, refresh) => {      
           testSlideActive(0);
 
           cpt.prev();
@@ -88,6 +148,17 @@ export function main() {
           cpt.prev();
           refresh();
           testSlideActive(0);
+        });
+      }));
+      
+    it('should navigate to another slide',
+      inject([TestComponentBuilder, AsyncTestCompleter], (tcb: TestComponentBuilder, async) => {
+        runTest({}, tcb, async, (rootTC, refresh) => {      
+          testSlideActive(0);
+
+          cpt.navigateTo(2);
+          refresh();
+          testSlideActive(2);
         });
       }));
   });
