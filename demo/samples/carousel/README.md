@@ -4,8 +4,8 @@ A carousel component similar to [Bootstrap javascript carousel](http://getbootst
 
 | Name | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
-| **index** | int | 0 | Index (0-based) of the active slide. |
-| **interval** | int | 5000 | The amount of time to delay between automatically cycling an item. If false or negative, carousel will not automatically cycle. |
+| **index** | number | 0 | Index (0-based) of the active slide. |
+| **interval** | number | 5000 | The amount of time to delay between automatically cycling an item. If false or negative, carousel will not automatically cycle. |
 | **pause** | string | "hover" | Pauses the cycling of the carousel on mouseover and resumes the cycling of the carousel on mouseout. |
 | **wrap** | boolean | true | Whether the carousel should cycle continuously or have hard stops. |
 | **no-transition** | boolean | false | Whether transitions are activated. |
