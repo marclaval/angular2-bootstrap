@@ -50,7 +50,7 @@ var PATH = {
   },
   src: {
     html: ['demo/**/*.html', 'src/**/*.html'],
-    css: ['demo/**/*.css'],
+    assets: ['demo/**/*.css', 'demo/**/*.js'],
     md: ['demo/**/*.md'],
     ts: ['demo/**/*.ts', 'src/**/*.ts'],
     test: ['test/**/*.ts'],
@@ -151,7 +151,7 @@ gulp.task('build.js.dev', function () {
 
 gulp.task('build.assets.dev', ['build.js.dev'], function () {
   var filterMD = filter('**/*.md');
-  return gulp.src(PATH.src.html.concat(PATH.src.css.concat(PATH.src.md)))
+  return gulp.src(PATH.src.html.concat(PATH.src.assets.concat(PATH.src.md)))
     .pipe(filterMD)
     .pipe(markdown())
     .pipe(convertTables())
@@ -227,7 +227,7 @@ gulp.task('build.js.prod', ['build.js.tmp'], function() {
 
 gulp.task('build.assets.prod', ['build.js.prod'], function () {
   var filterCSS = filter('**/*.css');
-  return gulp.src(PATH.src.css)
+  return gulp.src(PATH.src.assets)
     .pipe(filterCSS)
     .pipe(minifyCSS())
     .pipe(filterCSS.restore())

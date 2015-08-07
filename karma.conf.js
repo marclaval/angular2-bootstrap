@@ -15,6 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'dist/dev/shims_for_IE.js',
       'node_modules/angular2/node_modules/zone.js/dist/zone-microtask.js',
       'node_modules/angular2/node_modules/zone.js/dist/long-stack-trace-zone.js',
       'node_modules/angular2/node_modules/zone.js/dist/jasmine-patch.js',
