@@ -9,15 +9,15 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 100;
 // we will call `__karma__.start()` later, once all the specs are loaded.
 __karma__.loaded = function() {};
 
-System.baseURL = '/base/';
-
-// So that we can import packages like `core/foo`, instead of `core/src/foo`.
-System.paths = {
-  '*': '*.js',
-  'src/*': 'dist/dev/*.js',
-  'angular2/angular2': 'dist/dev/lib/angular2.js',
-  'angular2/router': 'dist/dev/lib/router.js'
-};
+System.config({
+  baseURL: '/base/',
+  defaultJSExtensions: true,
+  paths: {
+    'src/*': 'dist/dev/*.js',
+    'angular2/*': 'node_modules/angular2/*.js',
+    'rx': 'node_modules/angular2/node_modules/rx/dist/rx.js'
+  }
+});
 
 System.import('angular2/src/dom/browser_adapter').then(function(browser_adapter) {
   browser_adapter.BrowserDomAdapter.makeCurrent();

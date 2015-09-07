@@ -15,21 +15,15 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'dist/dev/shims_for_IE.js',
-      'node_modules/angular2/node_modules/zone.js/dist/zone-microtask.js',
-      'node_modules/angular2/node_modules/zone.js/dist/long-stack-trace-zone.js',
-      'node_modules/angular2/node_modules/zone.js/dist/jasmine-patch.js',
-      'node_modules/angular2/node_modules/traceur/bin/traceur-runtime.js',
-      'node_modules/es6-module-loader/dist/es6-module-loader-sans-promises.src.js',
-      'node_modules/systemjs/dist/system.src.js',
-      'node_modules/reflect-metadata/Reflect.js',
-
-      'dist/dev/lib/angular2.js',
-      'dist/dev/lib/router.js',
-      'dist/dev/lib/test.js',
+      'dist/dev/lib/shims_for_old_browsers.js',
+      'dist/dev/lib/traceur-runtime.js',
+      'node_modules/systemjs/dist/system.js',
+      'dist/dev/lib/angular2.dev.js',
+      
       { pattern: 'dist/dev/**/*.js', included: false, watched: false },
       { pattern: 'dist/dev/**/*.html', included: false, watched: false },
-      'test-main.js',
+      { pattern: 'node_modules/angular2/**/*.js', included: false, watched: false },
+      'test-main.js'
     ],
 
 

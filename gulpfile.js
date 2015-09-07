@@ -7,7 +7,6 @@ var inject = require('gulp-inject');
 var markdown = require('gulp-markdown');
 var minifyCSS = require('gulp-minify-css');
 var minifyHTML = require('gulp-minify-html');
-var plumber = require('gulp-plumber');
 var protractor = require('gulp-protractor').protractor;
 var sourcemaps = require('gulp-sourcemaps');
 var tsc = require('gulp-typescript');
@@ -24,7 +23,6 @@ var karma = require('karma').server;
 var path = require('path');
 var join = path.join;
 var runSequence = require('run-sequence');
-var series = require('stream-series');
 var through2 = require('through2');
 
 var express = require('express');
@@ -37,10 +35,7 @@ var PATH = {
     all: 'dist',
     dev: {
       all: 'dist/dev',
-      lib: 'dist/dev/lib',
-      ng2: 'dist/dev/lib/angular2.js',
-      router: 'dist/dev/lib/router.js',
-      test: 'dist/dev/lib/test.js'
+      lib: 'dist/dev/lib'
     },
     prod: {
       all: 'dist/prod',
@@ -50,42 +45,29 @@ var PATH = {
   },
   src: {
     html: ['demo/**/*.html', 'src/**/*.html'],
-    assets: ['demo/**/*.css', 'demo/**/*.js'],
+    assets: ['demo/**/*.css'],
     md: ['demo/**/*.md'],
     ts: ['demo/**/*.ts', 'src/**/*.ts'],
     test: ['test/**/*.ts'],
     // Order is quite important here for the HTML tag injection.
-    lib: [
-      './node_modules/angular2/node_modules/traceur/bin/traceur-runtime.js',
-      './node_modules/es6-module-loader/dist/es6-module-loader-sans-promises.js',
-      './node_modules/es6-module-loader/dist/es6-module-loader-sans-promises.js.map',
-      './node_modules/reflect-metadata/Reflect.js',
-      './node_modules/reflect-metadata/Reflect.js.map',
-      './node_modules/systemjs/dist/system.src.js',
-      './node_modules/angular2/node_modules/zone.js/dist/zone.js'
-    ]
-  }
-};
-
-var ng2Builder = new Builder({
-  paths: {
-    'angular2/*': 'node_modules/angular2/es6/dev/*.js',
-    rx: 'node_modules/angular2/node_modules/rx/dist/rx.js'
-  },
-  meta: {
-    rx: {
-      format: 'cjs'
+    lib: {
+      dev: [
+        'demo/shims_for_old_browsers.js',
+        'node_modules/angular2/node_modules/traceur/bin/traceur-runtime.js',
+        'node_modules/systemjs/dist/system.js',
+        'demo/system.conf.js',
+        'node_modules/angular2/bundles/angular2.dev.js'
+      ],
+      prod: [
+        'demo/shims_for_old_browsers.js',
+        'node_modules/angular2/node_modules/traceur/bin/traceur-runtime.js',
+        'node_modules/systemjs/dist/system-csp-production.js',
+        'demo/system.conf.js',
+        'node_modules/angular2/bundles/angular2.min.js'
+      ]
     }
   }
-});
-
-var appProdBuilder = new Builder({
-  baseURL: 'file:./tmp',
-  meta: {
-    'angular2/angular2': { build: false },
-    'angular2/router': { build: false }
-  }
-});
+};
 
 var tsProject = tsc.createProject('tsconfig.json', {
   typescript: require('typescript')
@@ -126,21 +108,13 @@ gulp.task('clean.tmp', function(done) {
 
 // --------------
 // Build dev.
-
-gulp.task('build.ng2.dev', function () {
-  ng2Builder.build('angular2/router', PATH.dest.dev.router, {});
-  ng2Builder.build('angular2/test', PATH.dest.dev.test, {});
-  return ng2Builder.build('angular2/angular2', PATH.dest.dev.ng2, {});
-});
-
-gulp.task('build.lib.dev', ['build.ng2.dev'], function () {
-  return gulp.src(PATH.src.lib)
+gulp.task('build.lib.dev', function () {
+  return gulp.src(PATH.src.lib.dev)
     .pipe(gulp.dest(PATH.dest.dev.lib));
 });
 
 gulp.task('build.js.dev', function () {
   var result = gulp.src(PATH.src.ts.concat(PATH.src.test))
-    .pipe(plumber())
     .pipe(sourcemaps.init())
     .pipe(tsc(tsProject));
 
@@ -160,9 +134,9 @@ gulp.task('build.assets.dev', ['build.js.dev'], function () {
 });
 
 gulp.task('build.index.dev', function() {
-  var target = gulp.src(injectableDevAssetsRef(), { read: false });
+  var lib = gulp.src(injectableDevAssetsRef(), { read: false });
   return gulp.src('./demo/index.html')
-    .pipe(inject(target, { transform: transformPath('dev') }))
+    .pipe(inject(lib, { transform: transformPath('dev') }))
     .pipe(gulp.dest(PATH.dest.dev.all));
 });
 
@@ -176,20 +150,17 @@ gulp.task('build.dev', function (done) {
 
 // --------------
 // Build prod.
-
-gulp.task('build.ng2.prod', function () {
-  ng2Builder.build('angular2/router', join('tmp', 'router.js'), {});
-  return ng2Builder.build('angular2/angular2', join('tmp', 'angular2.js'), {});
+var appProdBuilder = new Builder({
+  baseURL: 'tmp',
+  meta: {
+    'angular2/angular2': { build: false },
+    'angular2/router': { build: false }
+  },
+  defaultJSExtensions: true
 });
 
-gulp.task('build.lib.prod', ['build.ng2.prod'], function () {
-  var jsOnly = filter('**/*.js');
-  var lib = gulp.src(PATH.src.lib);
-  var ng2 = gulp.src('tmp/angular2.js');
-  var router = gulp.src('tmp/router.js');
-
-  return series(lib, ng2, router)
-    .pipe(jsOnly)
+gulp.task('build.lib.prod', function () {
+  return gulp.src(PATH.src.lib.prod)
     .pipe(concat(PATH.dest.prod.ng2))
     .pipe(uglify())
     .pipe(gulp.dest(PATH.dest.prod.lib));
@@ -211,7 +182,6 @@ gulp.task('build.assets.tmp', function () {
 
 gulp.task('build.js.tmp', ['build.assets.tmp'], function () {
   var result = gulp.src(PATH.src.ts)
-    .pipe(plumber())
     .pipe(tsc(tsProject));
 
   return result.js
@@ -235,15 +205,14 @@ gulp.task('build.assets.prod', ['build.js.prod'], function () {
 });
 
 gulp.task('build.index.prod', function() {
-  var target = gulp.src([join(PATH.dest.prod.lib, PATH.dest.prod.ng2),
+  var lib = gulp.src([join(PATH.dest.prod.lib, PATH.dest.prod.ng2),
                          join(PATH.dest.prod.all, '**/*.css')], { read: false });
   return gulp.src('./demo/index.html')
-    .pipe(inject(target, { transform: transformPath('prod') }))
+    .pipe(inject(lib, { transform: transformPath('prod') }))
     .pipe(gulp.dest(PATH.dest.prod.all));
 });
 
 gulp.task('build.app.prod', function (done) {
-  // build.init.prod does not work as sub tasks dependencies so placed it here.
   runSequence('clean.app.prod', 'build.assets.prod', 'build.index.prod', 'clean.tmp', done);
 });
 
@@ -252,7 +221,7 @@ gulp.task('build.prod', function (done) {
 });
 
 // --------------
-// Test.
+// Unit tests.
 gulp.task('karma-launch', function() {
   karma.start({
     configFile: join(__dirname, 'karma.conf.js')
@@ -287,6 +256,8 @@ gulp.task('test', ['build.dev'], function (neverDone) {
   );
 });
 
+// --------------
+// E2E tests.
 var e2eServer = null;
 gulp.task('e2eServer', ['build.dev'], function (done) {
   e2eServer = http.createServer(_startSPA('dev'));
@@ -334,11 +305,10 @@ function transformPath(env) {
 }
 
 function injectableDevAssetsRef() {
-  var src = PATH.src.lib.map(function(path) {
+  var src = PATH.src.lib.dev.map(function(path) {
     return join(PATH.dest.dev.lib, path.split('/').pop());
   });
-  src.push(PATH.dest.dev.ng2, PATH.dest.dev.router,
-           join(PATH.dest.dev.all, '**/*.css'));
+  src.push(join(PATH.dest.dev.all, '**/*.css'));
   return src;
 }
 
