@@ -2,14 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <title>Angular2 - Bootstrap</title>
     <!-- inject:css -->
     <link rel="stylesheet" href="demo.css">
     <!-- endinject -->
-    <!--[if gte IE 9]>
-        <script src="shims_for_IE.js"></script>
-    <![endif]-->
 </head>
 <body>
     <demo-app>
@@ -21,7 +18,7 @@
     <!-- endinject -->
 
     <script>
-        System.import('demo-app').catch(console.log.bind(console));
+        System.import('demo-app').catch(Function.prototype.bind.call(console.log, console));
     </script>
 </body>
 
