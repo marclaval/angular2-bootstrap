@@ -19,7 +19,7 @@ var del = require('del');
 var exec = require('child_process').exec;
 var fs = require('fs');
 var http = require('http');
-var karma = require('karma').server;
+var karma = require('karma').Server;
 var path = require('path');
 var join = path.join;
 var runSequence = require('run-sequence');
@@ -124,12 +124,12 @@ gulp.task('build.js.dev', function () {
 });
 
 gulp.task('build.assets.dev', ['build.js.dev'], function () {
-  var filterMD = filter('**/*.md');
+  var filterMD = filter('**/*.md', {restore: true});
   return gulp.src(PATH.src.html.concat(PATH.src.assets.concat(PATH.src.md)))
     .pipe(filterMD)
     .pipe(markdown())
     .pipe(convertTables())
-    .pipe(filterMD.restore())
+    .pipe(filterMD.restore)
     .pipe(gulp.dest(PATH.dest.dev.all));
 });
 
@@ -167,16 +167,16 @@ gulp.task('build.lib.prod', function () {
 });
 
 gulp.task('build.assets.tmp', function () {
-  var filterMD = filter('**/*.md');
-  var filterHTML = filter('**/*.html');
+  var filterMD = filter('**/*.md', {restore: true});
+  var filterHTML = filter('**/*.html', {restore: true});
   return gulp.src(PATH.src.html.concat(PATH.src.md))
     .pipe(filterMD)
     .pipe(markdown())
     .pipe(convertTables())
-    .pipe(filterMD.restore())
+    .pipe(filterMD.restore)
     .pipe(filterHTML)
     .pipe(minifyHTML({ conditionals: true }))
-    .pipe(filterHTML.restore())
+    .pipe(filterHTML.restore)
     .pipe(gulp.dest('tmp'));
 });
 
@@ -196,11 +196,11 @@ gulp.task('build.js.prod', ['build.js.tmp'], function() {
 });
 
 gulp.task('build.assets.prod', ['build.js.prod'], function () {
-  var filterCSS = filter('**/*.css');
+  var filterCSS = filter('**/*.css', {restore: true});
   return gulp.src(PATH.src.assets)
     .pipe(filterCSS)
     .pipe(minifyCSS())
-    .pipe(filterCSS.restore())
+    .pipe(filterCSS.restore)
     .pipe(gulp.dest(PATH.dest.prod.all));
 });
 
@@ -222,10 +222,11 @@ gulp.task('build.prod', function (done) {
 
 // --------------
 // Unit tests.
-gulp.task('karma-launch', function() {
-  karma.start({
+gulp.task('karma-launch', function(done) {
+  var server = new karma({
     configFile: join(__dirname, 'karma.conf.js')
-  });
+  }, done);
+  server.start();
 });
 
 gulp.task('karma-run', function (done) {
