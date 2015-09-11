@@ -12,20 +12,32 @@ import {
   inject,
   it,
   xit,
+  dispatchEvent
 } from 'angular2/test';
-import {Component, View} from 'angular2/angular2';
+import {Component, View, NgIf} from 'angular2/angular2';
 import {Carousel, CarouselSlide, CarouselCaption} from 'src/carousel/carousel';
+import {DOM} from 'angular2/src/dom/dom_adapter';
 
 export function main() {
   describe('Carousel', () => {
     var cpt : Carousel = null;
     var el : HTMLElement = null;
+    var clock;
+    
+    beforeEach(function(){
+       clock = sinon.useFakeTimers();
+    });
+    afterEach(function() {
+      clock.restore();
+    });
 
     function runTest({nbOfSlides = 3, index = 0, interval = 1000, noTransition = true, pause = "hover", wrap = true}, tcb, async, cb) {
-      var html = `<carousel index="${index}" interval="${noTransition}" no-transition="${noTransition}" pause="${pause}" wrap="${wrap}">`;
+      var html = `<carousel index="${index}" interval="${interval}" no-transition="${noTransition}" pause="${pause}" wrap="${wrap}"`;
+      html += ' (indexchange)="onIndexChange($event)" (slidestart)="onSlideStart()" (slideend)="onSlideEnd()">'
       for (var i = 0; i < nbOfSlides; i++) {
         html += `<carousel-slide><div>${i+1}</div></carousel-slide>`;
       }
+      html += '<carousel-slide template="ng-if moreSlide"><div>a</div></carousel-slide>';
       html += '</carousel>';
       tcb.overrideTemplate(TestComponent, html)
         .createAsync(TestComponent)
@@ -159,11 +171,171 @@ export function main() {
           cpt.navigateTo(2);
           refresh();
           testSlideActive(2);
+          
+          cpt.index = 0;
+          refresh();
+          testSlideActive(0);
+        });
+      }));
+      
+    it('should not go forward if interval is negative',
+      inject([TestComponentBuilder, AsyncTestCompleter], (tcb: TestComponentBuilder, async) => {
+        runTest({}, tcb, async, (rootTC, refresh) => {      
+          testSlideActive(0);
+
+          clock.tick(1500);
+          refresh();
+          testSlideActive(1);
+          
+          cpt.interval = -1;
+          clock.tick(1500);
+          refresh();
+          testSlideActive(1);
+          
+          cpt.interval = 1000;
+          clock.tick(1500);
+          refresh();
+          testSlideActive(2);
+        });
+      }));
+    
+    it('should be playing by default and cycle through slides',
+      inject([TestComponentBuilder, AsyncTestCompleter], (tcb: TestComponentBuilder, async) => {
+        runTest({}, tcb, async, (rootTC, refresh) => {      
+          testSlideActive(0);
+
+          clock.tick(1500);
+          refresh();
+          testSlideActive(1);
+          
+          clock.tick(1000);
+          refresh();
+          testSlideActive(2);
+          
+          clock.tick(1000);
+          refresh();
+          testSlideActive(0);
+        });
+      }));
+      
+    it('should pause and play on mouse over',
+      inject([TestComponentBuilder, AsyncTestCompleter], (tcb: TestComponentBuilder, async) => {
+        runTest({}, tcb, async, (rootTC, refresh) => {      
+          testSlideActive(0);
+
+          clock.tick(1500);
+          refresh();
+          testSlideActive(1);
+          
+          DOM.dispatchEvent(el, DOM.createMouseEvent('mouseenter'));
+          clock.tick(1000);
+          refresh();
+          testSlideActive(1);
+          
+          DOM.dispatchEvent(el, DOM.createMouseEvent('mouseleave'));
+          clock.tick(1000);
+          refresh();
+          testSlideActive(2);
+        });
+      }));
+      
+    it('should not pause and play on mouse over when pause is not set to hover',
+      inject([TestComponentBuilder, AsyncTestCompleter], (tcb: TestComponentBuilder, async) => {
+        runTest({pause: null}, tcb, async, (rootTC, refresh) => {      
+          testSlideActive(0);
+
+          clock.tick(1500);
+          refresh();
+          testSlideActive(1);
+          
+          DOM.dispatchEvent(el, DOM.createMouseEvent('mouseenter'));
+          clock.tick(1000);
+          refresh();
+          testSlideActive(2);
+          
+          DOM.dispatchEvent(el, DOM.createMouseEvent('mouseleave'));
+          clock.tick(1000);
+          refresh();
+          testSlideActive(0);
+        });
+      }));
+      
+    //TODO: rewrite when slide order issue is fixed
+    it('should remove slide from dom and change active slide',
+      inject([TestComponentBuilder, AsyncTestCompleter], (tcb: TestComponentBuilder, async) => {
+        runTest({}, tcb, async, (rootTC, refresh) => {      
+          expect(getSlides().length).toEqual(3);
+
+          rootTC.componentInstance.moreSlide = true;
+          refresh();
+          expect(getSlides().length).toEqual(4);
+        });
+      }));
+      
+    it('should not cycle when wrap=false',
+      inject([TestComponentBuilder, AsyncTestCompleter], (tcb: TestComponentBuilder, async) => {
+        runTest({wrap: false}, tcb, async, (rootTC, refresh) => {      
+          testSlideActive(0);
+
+          cpt.prev();
+          refresh();
+          testSlideActive(0);
+          
+          cpt.index = 2;
+          refresh();
+          testSlideActive(2);
+          
+          cpt.next();
+          refresh();
+          testSlideActive(2);
+          
+          clock.tick(1500);
+          refresh();
+          testSlideActive(2);
+        });
+      }));
+      
+    it('should raise events during each transition',
+      inject([TestComponentBuilder, AsyncTestCompleter], (tcb: TestComponentBuilder, async) => {
+        runTest({}, tcb, async, (rootTC, refresh) => {
+          sinon.spy(rootTC.componentInstance, "onIndexChange");   
+          sinon.spy(rootTC.componentInstance, "onSlideStart");
+          sinon.spy(rootTC.componentInstance, "onSlideEnd");
+          
+          expect(rootTC.componentInstance.onIndexChange.called).toBeFalsy();
+          expect(rootTC.componentInstance.onSlideStart.called).toBeFalsy();
+          expect(rootTC.componentInstance.onSlideEnd.called).toBeFalsy();
+
+          cpt.next();
+          refresh();
+          clock.tick(0);
+          expect(rootTC.componentInstance.onIndexChange.callCount).toBe(1);
+          expect(rootTC.componentInstance.onSlideStart.callCount).toBe(1);
+          expect(rootTC.componentInstance.onSlideEnd.callCount).toBe(1);
+          
+          cpt.next();
+          refresh();
+          clock.tick(0);
+          expect(rootTC.componentInstance.onIndexChange.callCount).toBe(2);
+          expect(rootTC.componentInstance.onSlideStart.callCount).toBe(2);
+          expect(rootTC.componentInstance.onSlideEnd.callCount).toBe(2);
+          
+          cpt.next();
+          refresh();
+          clock.tick(0);
+          expect(rootTC.componentInstance.onIndexChange.callCount).toBe(3);
+          expect(rootTC.componentInstance.onSlideStart.callCount).toBe(3);
+          expect(rootTC.componentInstance.onSlideEnd.callCount).toBe(3);
         });
       }));
   });
 };
 
 @Component({selector: 'test-cmp'})
-@View({directives: [Carousel, CarouselSlide, CarouselCaption]})
-class TestComponent {}
+@View({directives: [NgIf, Carousel, CarouselSlide, CarouselCaption]})
+class TestComponent {
+  moreSlide: boolean = false;
+  onIndexChange() {}
+  onSlideStart() {}
+  onSlideEnd() {}
+}

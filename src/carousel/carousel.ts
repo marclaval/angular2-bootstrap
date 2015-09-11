@@ -107,8 +107,10 @@ export class Carousel {
       if (slide === activeSlide || (typeof activeSlide === "undefined" && this._activeIndex == this._slides.length)) {
         slide.activate();
         if (this._activeIndex !== this._slides.length) {
+          if (typeof this._activeIndex != "string") {
+            this.indexchange.next(this._slides.length);
+          }
           this._activeIndex = this._slides.length;
-          this.indexchange.next(this._activeIndex);
         }
         activationDone = true;
       }
@@ -176,8 +178,11 @@ export class Carousel {
     this._activeIndex = newValue;
     this._isChangingSlide = false;
     this._isToRight = null;
-    this.slideend.next(null);
-    this.indexchange.next(this._activeIndex);
+    if (currentSlide || nextSlide) {
+      this.slideend.next(null);
+      this.indexchange.next(this._activeIndex);
+    }
+    
   }
   
   navigateTo(newIndex: number): void {
