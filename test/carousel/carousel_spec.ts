@@ -16,7 +16,7 @@ import {
 } from 'angular2/test';
 import {Component, View, NgIf} from 'angular2/angular2';
 import {Carousel, CarouselSlide, CarouselCaption} from 'src/carousel/carousel';
-import {DOM} from 'angular2/src/dom/dom_adapter';
+import {DOM} from 'angular2/src/core/dom/dom_adapter';
 
 export function main() {
   describe('Carousel', () => {
