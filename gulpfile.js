@@ -222,10 +222,10 @@ gulp.task('build.prod', function (done) {
 
 // --------------
 // Unit tests.
-gulp.task('karma-launch', function(done) {
+gulp.task('karma-launch', function() {
   var server = new karma({
     configFile: join(__dirname, 'karma.conf.js')
-  }, done);
+  });
   server.start();
 });
 

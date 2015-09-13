@@ -6,25 +6,25 @@
   "bundle": "typings/tsd.d.ts",
   "installed": {
     "angular2/angular2.d.ts": {
-      "commit": "a461a243e2e09b213bc49d12650f80d81047576d"
+      "commit": "7a3ca1f0b8a0960af9fc1838f3234cc9d6ce0645"
     },
     "angular2/router.d.ts": {
-      "commit": "a461a243e2e09b213bc49d12650f80d81047576d"
+      "commit": "7a3ca1f0b8a0960af9fc1838f3234cc9d6ce0645"
     },
     "es6-promise/es6-promise.d.ts": {
-      "commit": "a461a243e2e09b213bc49d12650f80d81047576d"
+      "commit": "7a3ca1f0b8a0960af9fc1838f3234cc9d6ce0645"
     },
     "jasmine/jasmine.d.ts": {
-      "commit": "a461a243e2e09b213bc49d12650f80d81047576d"
+      "commit": "7a3ca1f0b8a0960af9fc1838f3234cc9d6ce0645"
     },
     "rx/rx.d.ts": {
-      "commit": "a461a243e2e09b213bc49d12650f80d81047576d"
+      "commit": "7a3ca1f0b8a0960af9fc1838f3234cc9d6ce0645"
     },
     "rx/rx-lite.d.ts": {
-      "commit": "a461a243e2e09b213bc49d12650f80d81047576d"
+      "commit": "7a3ca1f0b8a0960af9fc1838f3234cc9d6ce0645"
     },
     "sinon/sinon.d.ts": {
-      "commit": "a461a243e2e09b213bc49d12650f80d81047576d"
+      "commit": "7a3ca1f0b8a0960af9fc1838f3234cc9d6ce0645"
     }
   }
 }
