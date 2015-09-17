@@ -16,6 +16,7 @@ var webdriver_update = require('gulp-protractor').webdriver_update;
 
 var Builder = require('systemjs-builder');
 var del = require('del');
+var escape = require('escape-html');
 var exec = require('child_process').exec;
 var fs = require('fs');
 var http = require('http');
@@ -46,6 +47,7 @@ var PATH = {
   src: {
     html: ['demo/**/*.html', 'src/**/*.html'],
     assets: ['demo/**/*.css'],
+    sourceToDisplay: ['demo/**/demo-*', '!demo/demo-app.ts'],
     md: ['demo/**/*.md'],
     ts: ['demo/**/*.ts', 'src/**/*.ts'],
     test: ['test/**/*.ts'],
@@ -56,14 +58,16 @@ var PATH = {
         'node_modules/angular2/node_modules/traceur/bin/traceur-runtime.js',
         'node_modules/systemjs/dist/system.js',
         'demo/system.conf.js',
-        'node_modules/angular2/bundles/angular2.dev.js'
+        'node_modules/angular2/bundles/angular2.dev.js',
+        'node_modules/angular2/bundles/router.dev.js'
       ],
       prod: [
         'demo/shims_for_old_browsers.js',
         'node_modules/angular2/node_modules/traceur/bin/traceur-runtime.js',
         'node_modules/systemjs/dist/system-csp-production.js',
         'demo/system.conf.js',
-        'node_modules/angular2/bundles/angular2.min.js'
+        'node_modules/angular2/bundles/angular2.min.js',
+        'node_modules/angular2/bundles/router.dev.js'
       ]
     }
   }
@@ -123,9 +127,17 @@ gulp.task('build.js.dev', function () {
     .pipe(gulp.dest(PATH.dest.dev.all));
 });
 
-gulp.task('build.assets.dev', ['build.js.dev'], function () {
+gulp.task('build.sources.dev', ['build.js.dev'], function () {
+  var filterSourceCode = filter('**/samples/**/demo-*', {restore: true});
+  return gulp.src(PATH.src.assets.concat(PATH.src.sourceToDisplay))
+    .pipe(filterSourceCode)
+    .pipe(convertSourceCode())
+    .pipe(filterSourceCode.restore)
+    .pipe(gulp.dest(PATH.dest.dev.all));
+});
+gulp.task('build.assets.dev', ['build.sources.dev'], function () {
   var filterMD = filter('**/*.md', {restore: true});
-  return gulp.src(PATH.src.html.concat(PATH.src.assets.concat(PATH.src.md)))
+  return gulp.src(PATH.src.html.concat(PATH.src.md))
     .pipe(filterMD)
     .pipe(markdown())
     .pipe(convertTables())
@@ -166,7 +178,15 @@ gulp.task('build.lib.prod', function () {
     .pipe(gulp.dest(PATH.dest.prod.lib));
 });
 
-gulp.task('build.assets.tmp', function () {
+gulp.task('build.sources.tmp', function () {
+  var filterSourceCode = filter('**/samples/**/demo-*', {restore: true});
+  return gulp.src(PATH.src.assets.concat(PATH.src.sourceToDisplay))
+    .pipe(filterSourceCode)
+    .pipe(convertSourceCode())
+    .pipe(filterSourceCode.restore)
+    .pipe(gulp.dest('tmp'));
+});
+gulp.task('build.assets.tmp', ['build.sources.tmp'], function () {
   var filterMD = filter('**/*.md', {restore: true});
   var filterHTML = filter('**/*.html', {restore: true});
   return gulp.src(PATH.src.html.concat(PATH.src.md))
@@ -326,12 +346,24 @@ function _startSPA(env) {
 }
 
 function convertTables() {
-    return through2.obj(function(file, encoding, done) {
-        var content = String(file.contents).replace(/<table>/g, '<table class="table table-bordered">');
-        file.contents = new Buffer(content);
-        this.push(file);
-        done();
-    });
+  return through2.obj(function (file, encoding, done) {
+    var content = String(file.contents).replace(/<table>/g, '<table class="table table-bordered">');
+    file.contents = new Buffer(content);
+    this.push(file);
+    done();
+  });
+}
+
+function convertSourceCode() {
+  return through2.obj(function (file, encoding, done) {
+    var ext = path.extname(file.path);
+    var language = ext == '.ts' ? 'typescript' : 'html';
+    var content = '<pre><code class="language-' + language + '" ng-non-bindable>' + escape(String(file.contents)) + '</code></pre>';
+    file.contents = new Buffer(content);
+    file.path += '.source.html';
+    this.push(file);
+    done();
+  });
 }
 
 function inlineTemplates(folder) {
@@ -341,7 +373,7 @@ function inlineTemplates(folder) {
         var re = new RegExp("templateUrl\\s*:\\s*(\'|\"|\`)([^\'\"\`]*)(\'|\"|\`)", "g");
         var res = re.exec(content);
         while (res) {
-          var tpl = fs.readFileSync(join(pathPrefix, res[2]), {encoding: 'utf8'}).replace(/\'/g, '\\\'');
+          var tpl = fs.readFileSync(join(pathPrefix, res[2]), {encoding: 'utf8'}).replace(/\'/g, '\\\'').replace(/(\r\n|\n|\r)/gm, '&#10;\'+\r\n\'');
           content = content.replace(res[0], 'template: \'' + tpl + '\'');
           res = re.exec(content);
         }

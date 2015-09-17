@@ -78,6 +78,7 @@ export class Carousel {
   private slidestart: EventEmitter = new EventEmitter();
   private slideend: EventEmitter = new EventEmitter();
   
+  private _el: ElementRef;
   private _activeIndex: number = -1;
   private _interval: number = 5000;
   private _isChangingSlide: boolean = false;
@@ -89,7 +90,8 @@ export class Carousel {
   private _transitionEnd: string = getTransitionEnd();
   private  _wrap: boolean = true;
 
-  constructor(@Query(CarouselSlide) query: QueryList<CarouselSlide>) {
+  constructor(@Query(CarouselSlide) query: QueryList<CarouselSlide>, el: ElementRef) {
+    this._el = el;
     this._startCycling();
     query.onChange(() => {
       this._registerSlides(query);
@@ -164,6 +166,8 @@ export class Carousel {
     //Initial value
     else if (this._activeIndex == -1) {
       this._finalizeTransition(null, null, newValue);
+      //Force change detection
+      this._el.parentView._view.changeDetector.detectChanges()
     }
   }
   private _finalizeTransition(currentSlide: CarouselSlide, nextSlide: CarouselSlide, newValue: number): void {

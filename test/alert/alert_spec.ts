@@ -38,7 +38,6 @@ export function main() {
         .createAsync(TestComponent)
         .then((rootTC) => {
           rootTC._componentParentView.changeDetector.detectChanges();
-          rootTC._componentParentView.changeDetector.detectChanges();
           cpt = rootTC.componentViewChildren[0].componentInstance;
           el = rootTC.componentViewChildren[0].nativeElement;       
           cb(rootTC, () => rootTC._componentParentView.changeDetector.detectChanges());

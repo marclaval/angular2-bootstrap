@@ -1,9 +1,19 @@
-<alert type="success" [dismissible]="false" [(opened)]="alertOpened">I am an alert without a close button! <br><a href="#" (click)="close($event)">Close Me!</a></alert>
+<alert type="success" [dismissible]="false" [(opened)]="alertOpened">
+	I am an alert without a close button! <br><a href="#" (click)="close($event)">Close Me!</a>
+</alert>
 
-<alert type="info" fade="false">I am an alert without any closing transition - close me and I just disappear!</alert>
+<alert type="info" fade="false">
+	I am an alert without any closing transition - close me and I just disappear!
+</alert>
 
-<alert type="warning" (closestart)="log('Start')" (closeend)="log('End')">I am an alert with callbacks for onclosestart and oncloseend - close me and check your console!</alert>
+<alert type="warning" (closestart)="log('Start')" (closeend)="log('End')">
+	I am an alert with callbacks for onclosestart and oncloseend - close me and check your console!
+</alert>
 
-<alert>I am the default type of alert which is "danger", so no attributes needed for me!</alert>
+<alert>
+	I am the default type of alert which is "danger", so no attributes needed for me!
+</alert>
 
-<button type="button" class="btn btn-default" (click)="toggle()">Open and close an alert from a button!</button>
+<button type="button" class="btn btn-default" (click)="toggle()">
+	Open and close an alert from a button!
+</button>

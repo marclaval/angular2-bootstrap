@@ -1,7 +1,7 @@
 describe("Carousel", function() {
 
   beforeEach(function(done) {
-    browser.get("/");
+    browser.get("/#/sample/carousel");
     browser.driver.wait(protractor.until.elementLocated(By.tagName('carousel')), 10000);
     element.all(by.css("input[type=checkbox]")).then(function(checkboxes) {
       checkboxes[2].click().then(function() {
