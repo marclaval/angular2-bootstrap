@@ -41,7 +41,7 @@ var PATH = {
     prod: {
       all: 'dist/prod',
       lib: 'dist/prod/lib',
-      ng2: 'angular2_and_all_libs.js'
+      ng2: 'angular2-and-all-libs.js'
     }
   },
   src: {
@@ -75,6 +75,14 @@ var PATH = {
 
 var tsProject = tsc.createProject('tsconfig.json', {
   typescript: require('typescript')
+});
+
+//Automate the generation
+gulp.task('generateDeclaration', ['clean.tmp'], function () {
+  var result = gulp.src(['src/**/*.ts'])
+    .pipe(tsc(tsProject));
+  return result.dts
+    .pipe(gulp.dest('tmp'));
 });
 
 var SERVER_PORT = 5555;
@@ -162,6 +170,15 @@ gulp.task('build.dev', function (done) {
 
 // --------------
 // Build prod.
+var demoProdBuilder = new Builder({
+  baseURL: 'tmp',
+  meta: {
+    'angular2-bootstrap': { build: false },
+    'angular2/angular2': { build: false },
+    'angular2/router': { build: false }
+  },
+  defaultJSExtensions: true
+});
 var appProdBuilder = new Builder({
   baseURL: 'tmp',
   meta: {
@@ -210,8 +227,12 @@ gulp.task('build.js.tmp', ['build.assets.tmp'], function () {
 });
 
 // TODO: add inline source maps (System only generate separate source maps file).
-gulp.task('build.js.prod', ['build.js.tmp'], function() {
-  return appProdBuilder.build('demo-app', join(PATH.dest.prod.all, 'demo-app.js'),
+gulp.task('build.demo.prod', ['build.js.tmp'], function() {
+  return demoProdBuilder.build('demo-app', join(PATH.dest.prod.all, 'demo-app.js'),
+    { minify: true }).catch(function (e) { console.log(e); });
+});
+gulp.task('build.js.prod', ['build.demo.prod'], function() {
+  return appProdBuilder.build('angular2-bootstrap', join(PATH.dest.prod.lib, 'angular2-bootstrap.js'),
     { minify: true }).catch(function (e) { console.log(e); });
 });
 
@@ -225,7 +246,7 @@ gulp.task('build.assets.prod', ['build.js.prod'], function () {
 });
 
 gulp.task('build.index.prod', function() {
-  var lib = gulp.src([join(PATH.dest.prod.lib, PATH.dest.prod.ng2),
+  var lib = gulp.src([join(PATH.dest.prod.lib, '**/*.js'),
                          join(PATH.dest.prod.all, '**/*.css')], { read: false });
   return gulp.src('./demo/index.html')
     .pipe(inject(lib, { transform: transformPath('prod') }))
