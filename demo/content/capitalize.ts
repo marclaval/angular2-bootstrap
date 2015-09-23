@@ -1,4 +1,3 @@
-/// <reference path="../../typings/tsd.d.ts" />
 import {Component, View, Pipe} from 'angular2/angular2';
 
 @Pipe({

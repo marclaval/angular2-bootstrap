@@ -1,4 +1,3 @@
-/// <reference path="../../typings/tsd.d.ts" />
 import {Component, View, Directive, ElementRef, Query, QueryList, NgFor, NgIf, EventEmitter} from 'angular2/angular2';
 
 @Directive({
@@ -102,8 +101,7 @@ export class Carousel {
     var activeSlide = this._slides[this._activeIndex];
     this._slides = [];
     var activationDone = false;
-    for (var i = 0; i < query.length; i++) {
-      var slide = query._results[i];
+    query.map((slide) => {
       slide.deactivate();
       slide.cleanAfterAnimation();
       if (slide === activeSlide || (typeof activeSlide === "undefined" && this._activeIndex == this._slides.length)) {
@@ -117,7 +115,7 @@ export class Carousel {
         activationDone = true;
       }
       this._slides.push(slide);
-    }
+    });
     if (!activationDone) {
       this._slides[0].activate();
       this._activeIndex = 0;
@@ -166,8 +164,8 @@ export class Carousel {
     //Initial value
     else if (this._activeIndex == -1) {
       this._finalizeTransition(null, null, newValue);
-      //Force change detection
-      this._el.parentView._view.changeDetector.detectChanges()
+      //TODO: remove: Force change detection (+ trick for TS compiler)
+      (<any>this._el.parentView)._view.changeDetector.detectChanges()
     }
   }
   private _finalizeTransition(currentSlide: CarouselSlide, nextSlide: CarouselSlide, newValue: number): void {

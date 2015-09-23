@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "Angular2 directives for Bootstrap",
   "scripts": {
-    "postinstall": "webdriver-manager update && tsd reinstall -so --config tsd.json",
+    "postinstall": "webdriver-manager update && tsd reinstall -so && tsd link && tsd rebundle",
     "test": "gulp test"
   },
   "repository": {

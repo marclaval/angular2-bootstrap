@@ -2,29 +2,14 @@
   "version": "v4",
   "repo": "borisyankov/DefinitelyTyped",
   "ref": "master",
-  "path": "typings",
-  "bundle": "typings/tsd.d.ts",
+  "path": "tsd_typings",
+  "bundle": "tsd_typings/tsd.d.ts",
   "installed": {
-    "angular2/angular2.d.ts": {
-      "commit": "7a3ca1f0b8a0960af9fc1838f3234cc9d6ce0645"
-    },
-    "angular2/router.d.ts": {
-      "commit": "7a3ca1f0b8a0960af9fc1838f3234cc9d6ce0645"
-    },
-    "es6-promise/es6-promise.d.ts": {
-      "commit": "7a3ca1f0b8a0960af9fc1838f3234cc9d6ce0645"
-    },
     "jasmine/jasmine.d.ts": {
-      "commit": "7a3ca1f0b8a0960af9fc1838f3234cc9d6ce0645"
-    },
-    "rx/rx.d.ts": {
-      "commit": "7a3ca1f0b8a0960af9fc1838f3234cc9d6ce0645"
-    },
-    "rx/rx-lite.d.ts": {
-      "commit": "7a3ca1f0b8a0960af9fc1838f3234cc9d6ce0645"
+      "commit": "32029fcb4e1a3ef8968711b545d77b584435729d"
     },
     "sinon/sinon.d.ts": {
-      "commit": "7a3ca1f0b8a0960af9fc1838f3234cc9d6ce0645"
+      "commit": "32029fcb4e1a3ef8968711b545d77b584435729d"
     }
   }
 }

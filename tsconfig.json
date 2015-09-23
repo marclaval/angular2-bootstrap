@@ -11,11 +11,5 @@
         "experimentalDecorators": true,
         "sourceMap": true
     },
-    "filesGlob": [
-        "./demo/**/*.ts",
-        "./src/**/*.ts",
-        "./test/**/*.ts",
-        "./typings/**/*.ts"
-    ],
     "compileOnSave": false
 }

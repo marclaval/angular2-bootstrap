@@ -1,4 +1,3 @@
-/// <reference path="../../typings/tsd.d.ts" />
 import {Component, View, DynamicComponentLoader, ElementRef} from 'angular2/angular2';
 import {RouteParams} from 'angular2/router';
 import {DemoCarousel} from './carousel/demo-carousel';
