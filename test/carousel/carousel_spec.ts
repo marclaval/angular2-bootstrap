@@ -1,7 +1,6 @@
 import {
   AsyncTestCompleter,
   TestComponentBuilder,
-  By,
   beforeEach,
   ddescribe,
   describe,
@@ -10,12 +9,16 @@ import {
   iit,
   inject,
   it,
-  xit,
-  dispatchEvent
-} from 'angular2/test';
+  xit
+} from 'angular2/test_lib';
 import {Component, View, NgIf} from 'angular2/angular2';
-import {Carousel, CarouselSlide, CarouselCaption} from 'src/carousel/carousel';
-import {DOM} from 'angular2/src/core/dom/dom_adapter';
+import {Carousel, CarouselSlide, CarouselCaption} from 'angular2-bootstrap';
+
+function _dispatchMouseEvent(el: HTMLElement, eventType: string) {
+  var evt: MouseEvent = document.createEvent('MouseEvent');
+  evt.initEvent(eventType, true, true);
+  el.dispatchEvent(evt);
+}
 
 export function main() {
   describe('Carousel', () => {
@@ -42,8 +45,8 @@ export function main() {
         .createAsync(TestComponent)
         .then((rootTC) => {
           rootTC._componentParentView.changeDetector.detectChanges();
-          cpt = rootTC.componentViewChildren[0].componentInstance;
-          el = rootTC.componentViewChildren[0].nativeElement;       
+          cpt = rootTC.debugElement.componentViewChildren[0].componentInstance;
+          el = rootTC.debugElement.componentViewChildren[0].nativeElement;      
           cb(rootTC, () => rootTC._componentParentView.changeDetector.detectChanges());
           async.done();
         });
@@ -225,12 +228,12 @@ export function main() {
           refresh();
           testSlideActive(1);
           
-          DOM.dispatchEvent(el, DOM.createMouseEvent('mouseenter'));
+          _dispatchMouseEvent(el, 'mouseenter');
           clock.tick(1000);
           refresh();
           testSlideActive(1);
           
-          DOM.dispatchEvent(el, DOM.createMouseEvent('mouseleave'));
+          _dispatchMouseEvent(el, 'mouseleave');
           clock.tick(1000);
           refresh();
           testSlideActive(2);
@@ -246,12 +249,12 @@ export function main() {
           refresh();
           testSlideActive(1);
           
-          DOM.dispatchEvent(el, DOM.createMouseEvent('mouseenter'));
+          _dispatchMouseEvent(el, 'mouseenter');
           clock.tick(1000);
           refresh();
           testSlideActive(2);
           
-          DOM.dispatchEvent(el, DOM.createMouseEvent('mouseleave'));
+          _dispatchMouseEvent(el, 'mouseleave');
           clock.tick(1000);
           refresh();
           testSlideActive(0);
@@ -261,10 +264,10 @@ export function main() {
     //TODO: rewrite when slide order issue is fixed
     it('should remove slide from dom and change active slide',
       inject([TestComponentBuilder, AsyncTestCompleter], (tcb: TestComponentBuilder, async) => {
-        runTest({}, tcb, async, (rootTC, refresh) => {      
+        runTest({}, tcb, async, (rootTC, refresh) => {
           expect(getSlides().length).toEqual(3);
 
-          rootTC.componentInstance.moreSlide = true;
+          rootTC.debugElement.componentInstance.moreSlide = true;
           refresh();
           expect(getSlides().length).toEqual(4);
         });
@@ -296,34 +299,34 @@ export function main() {
     it('should raise events during each transition',
       inject([TestComponentBuilder, AsyncTestCompleter], (tcb: TestComponentBuilder, async) => {
         runTest({}, tcb, async, (rootTC, refresh) => {
-          sinon.spy(rootTC.componentInstance, "onIndexChange");   
-          sinon.spy(rootTC.componentInstance, "onSlideStart");
-          sinon.spy(rootTC.componentInstance, "onSlideEnd");
+          sinon.spy(rootTC.debugElement.componentInstance, "onIndexChange");   
+          sinon.spy(rootTC.debugElement.componentInstance, "onSlideStart");
+          sinon.spy(rootTC.debugElement.componentInstance, "onSlideEnd");
           
-          expect(rootTC.componentInstance.onIndexChange.called).toBeFalsy();
-          expect(rootTC.componentInstance.onSlideStart.called).toBeFalsy();
-          expect(rootTC.componentInstance.onSlideEnd.called).toBeFalsy();
+          expect(rootTC.debugElement.componentInstance.onIndexChange.called).toBeFalsy();
+          expect(rootTC.debugElement.componentInstance.onSlideStart.called).toBeFalsy();
+          expect(rootTC.debugElement.componentInstance.onSlideEnd.called).toBeFalsy();
 
           cpt.next();
           refresh();
           clock.tick(0);
-          expect(rootTC.componentInstance.onIndexChange.callCount).toBe(1);
-          expect(rootTC.componentInstance.onSlideStart.callCount).toBe(1);
-          expect(rootTC.componentInstance.onSlideEnd.callCount).toBe(1);
+          expect(rootTC.debugElement.componentInstance.onIndexChange.callCount).toBe(1);
+          expect(rootTC.debugElement.componentInstance.onSlideStart.callCount).toBe(1);
+          expect(rootTC.debugElement.componentInstance.onSlideEnd.callCount).toBe(1);
           
           cpt.next();
           refresh();
           clock.tick(0);
-          expect(rootTC.componentInstance.onIndexChange.callCount).toBe(2);
-          expect(rootTC.componentInstance.onSlideStart.callCount).toBe(2);
-          expect(rootTC.componentInstance.onSlideEnd.callCount).toBe(2);
+          expect(rootTC.debugElement.componentInstance.onIndexChange.callCount).toBe(2);
+          expect(rootTC.debugElement.componentInstance.onSlideStart.callCount).toBe(2);
+          expect(rootTC.debugElement.componentInstance.onSlideEnd.callCount).toBe(2);
           
           cpt.next();
           refresh();
           clock.tick(0);
-          expect(rootTC.componentInstance.onIndexChange.callCount).toBe(3);
-          expect(rootTC.componentInstance.onSlideStart.callCount).toBe(3);
-          expect(rootTC.componentInstance.onSlideEnd.callCount).toBe(3);
+          expect(rootTC.debugElement.componentInstance.onIndexChange.callCount).toBe(3);
+          expect(rootTC.debugElement.componentInstance.onSlideStart.callCount).toBe(3);
+          expect(rootTC.debugElement.componentInstance.onSlideEnd.callCount).toBe(3);
         });
       }));
   });

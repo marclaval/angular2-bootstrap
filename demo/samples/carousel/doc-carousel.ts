@@ -1,30 +1,22 @@
-import {Component, View, NgNonBindable} from 'angular2/angular2';
+import {Component} from 'angular2/angular2';
 
 @Component({
-  selector: 'doc-carousel'
-})
-@View({
+  selector: 'doc-carousel',
   templateUrl: './samples/carousel/README.html'
 })
 export class DocCarousel {
 }
 
 @Component({
-  selector: 'source-html-carousel'
-})
-@View({
-  templateUrl: './samples/carousel/demo-carousel.html.source.html',
-  directives: [NgNonBindable]
+  selector: 'source-html-carousel',
+  templateUrl: './samples/carousel/demo-carousel.html.source.html'
 })
 export class SourceHtmlCarousel {
 }
 
 @Component({
-  selector: 'source-ts-carousel'
-})
-@View({
-  templateUrl: './samples/carousel/demo-carousel.ts.source.html',
-  directives: [NgNonBindable]
+  selector: 'source-ts-carousel',
+  templateUrl: './samples/carousel/demo-carousel.ts.source.html'
 })
 export class SourceTsCarousel {
 }

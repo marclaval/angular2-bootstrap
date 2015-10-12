@@ -13,9 +13,9 @@ System.config({
   baseURL: '/base/',
   defaultJSExtensions: true,
   paths: {
-    'src/*': 'dist/dev/*.js',
+    'angular2-bootstrap': 'dist/dev/angular2-bootstrap.js',
     'angular2/*': 'node_modules/angular2/*.js',
-    'rx': 'node_modules/angular2/node_modules/rx/dist/rx.js'
+    '@reactivex/rxjs/*': 'node_modules/angular2/node_modules/@reactivex/rxjs/*.js'
   }
 });
 

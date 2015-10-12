@@ -1,10 +1,8 @@
-import {Component, View, NgIf} from 'angular2/angular2';
+import {Component, NgIf} from 'angular2/angular2';
 import {Carousel, CarouselSlide, CarouselCaption} from 'angular2-bootstrap';
 
 @Component({
-  selector: 'demo-carousel'
-})
-@View({
+  selector: 'demo-carousel',
   templateUrl: './samples/carousel/demo-carousel.html',
   directives: [NgIf, Carousel, CarouselSlide, CarouselCaption]
 })

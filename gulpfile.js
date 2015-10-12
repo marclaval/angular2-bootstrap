@@ -54,17 +54,17 @@ var PATH = {
     // Order is quite important here for the HTML tag injection.
     lib: {
       dev: [
+        'node_modules/es6-shim/es6-shim.js',
         'demo/shims_for_old_browsers.js',
-        'node_modules/angular2/node_modules/traceur/bin/traceur-runtime.js',
         'node_modules/systemjs/dist/system.js',
         'demo/system.conf.js',
         'node_modules/angular2/bundles/angular2.dev.js',
         'node_modules/angular2/bundles/router.dev.js'
       ],
       prod: [
+        'node_modules/es6-shim/es6-shim.js',
         'demo/shims_for_old_browsers.js',
-        'node_modules/angular2/node_modules/traceur/bin/traceur-runtime.js',
-        'node_modules/systemjs/dist/system-csp-production.js',
+        'node_modules/systemjs/dist/system.js',
         'demo/system.conf.js',
         'node_modules/angular2/bundles/angular2.min.js',
         'node_modules/angular2/bundles/router.dev.js'
@@ -170,8 +170,8 @@ gulp.task('build.dev', function (done) {
 
 // --------------
 // Build prod.
-var demoProdBuilder = new Builder({
-  baseURL: 'tmp',
+var demoProdBuilder = new Builder('tmp');
+demoProdBuilder.config({
   meta: {
     'angular2-bootstrap': { build: false },
     'angular2/angular2': { build: false },
@@ -179,8 +179,8 @@ var demoProdBuilder = new Builder({
   },
   defaultJSExtensions: true
 });
-var appProdBuilder = new Builder({
-  baseURL: 'tmp',
+var appProdBuilder = new Builder('tmp');
+appProdBuilder.config({
   meta: {
     'angular2/angular2': { build: false },
     'angular2/router': { build: false }
@@ -228,11 +228,11 @@ gulp.task('build.js.tmp', ['build.assets.tmp'], function () {
 
 // TODO: add inline source maps (System only generate separate source maps file).
 gulp.task('build.demo.prod', ['build.js.tmp'], function() {
-  return demoProdBuilder.build('demo-app', join(PATH.dest.prod.all, 'demo-app.js'),
+  return demoProdBuilder.bundle('demo-app', join(PATH.dest.prod.all, 'demo-app.js'),
     { minify: true }).catch(function (e) { console.log(e); });
 });
 gulp.task('build.js.prod', ['build.demo.prod'], function() {
-  return appProdBuilder.build('angular2-bootstrap', join(PATH.dest.prod.lib, 'angular2-bootstrap.js'),
+  return appProdBuilder.bundle('angular2-bootstrap', join(PATH.dest.prod.lib, 'angular2-bootstrap.js'),
     { minify: true }).catch(function (e) { console.log(e); });
 });
 

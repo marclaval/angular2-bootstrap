@@ -92,9 +92,7 @@ export class Carousel {
   constructor(@Query(CarouselSlide) query: QueryList<CarouselSlide>, el: ElementRef) {
     this._el = el;
     this._startCycling();
-    query.onChange(() => {
-      this._registerSlides(query);
-    });
+    (<any>query.changes).toRx().subscribe(_ => this._registerSlides(query));
   }
   
   private _registerSlides(query: QueryList<CarouselSlide>): void {
@@ -116,7 +114,7 @@ export class Carousel {
       }
       this._slides.push(slide);
     });
-    if (!activationDone) {
+    if (!activationDone && this._slides[0]) {
       this._slides[0].activate();
       this._activeIndex = 0;
       this.indexchange.next(this._activeIndex);
@@ -165,7 +163,7 @@ export class Carousel {
     else if (this._activeIndex == -1) {
       this._finalizeTransition(null, null, newValue);
       //TODO: remove: Force change detection (+ trick for TS compiler)
-      (<any>this._el.parentView)._view.changeDetector.detectChanges()
+      (<any>this._el).parentView._view.changeDetector.detectChanges()
     }
   }
   private _finalizeTransition(currentSlide: CarouselSlide, nextSlide: CarouselSlide, newValue: number): void {

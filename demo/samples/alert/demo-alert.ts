@@ -1,10 +1,8 @@
-import {Component, View} from 'angular2/angular2';
+import {Component} from 'angular2/angular2';
 import {Alert} from 'angular2-bootstrap';
 
 @Component({
-  selector: 'demo-alert'
-})
-@View({
+  selector: 'demo-alert',
   templateUrl: './samples/alert/demo-alert.html',
   directives: [Alert]
 })

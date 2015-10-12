@@ -1,6 +1,6 @@
-import { ElementRef, QueryList } from 'angular2/angular2';
+/// <reference path="../node_modules/angular2/bundles/typings/angular2/angular2.d.ts" />
 
-declare module angular2Bootstrap {
+declare module angular2Bootstrap {  
   class Alert {
     static alertTypes: string[];
     private _el;
@@ -12,7 +12,7 @@ declare module angular2Bootstrap {
     private _opened;
     private closestart;
     private closeend;
-    constructor(el: ElementRef);
+    constructor(el: ng.ElementRef);
     dismissible: string | boolean;
     fade: string | boolean;
     type: string;
@@ -29,7 +29,7 @@ declare module angular2Bootstrap {
     private _rightClass;
     private _prevClass;
     private _nextClass;
-    constructor(el: ElementRef);
+    constructor(el: ng.ElementRef);
     getElement(): HTMLElement;
     activate(): void;
     deactivate(): void;
@@ -58,7 +58,7 @@ declare module angular2Bootstrap {
     private _timerId;
     private _transitionEnd;
     private _wrap;
-    constructor(query: QueryList<CarouselSlide>, el: ElementRef);
+    constructor(query: ng.QueryList<CarouselSlide>, el: ng.ElementRef);
     private _registerSlides(query);
     wrap: boolean | string;
     noTransition: boolean | string;

@@ -1,7 +1,6 @@
 import {
   AsyncTestCompleter,
   TestComponentBuilder,
-  By,
   beforeEach,
   ddescribe,
   describe,
@@ -10,11 +9,10 @@ import {
   iit,
   inject,
   it,
-  xit,
-  dispatchEvent
-} from 'angular2/test';
+  xit
+} from 'angular2/test_lib';
 import {Component, View} from 'angular2/angular2';
-import {Alert} from 'src/alert/alert';
+import {Alert} from 'angular2-bootstrap';
 
 export function main() {
   describe('Alert', () => {
@@ -37,8 +35,8 @@ export function main() {
         .createAsync(TestComponent)
         .then((rootTC) => {
           rootTC._componentParentView.changeDetector.detectChanges();
-          cpt = rootTC.componentViewChildren[0].componentInstance;
-          el = rootTC.componentViewChildren[0].nativeElement;       
+          cpt = rootTC.debugElement.componentViewChildren[0].componentInstance;
+          el = rootTC.debugElement.componentViewChildren[0].nativeElement;       
           cb(rootTC, () => rootTC._componentParentView.changeDetector.detectChanges());
           async.done();
         });
@@ -72,26 +70,26 @@ export function main() {
     it('should close the alert when clicking the close button', 
       inject([TestComponentBuilder, AsyncTestCompleter], (tcb, async) => {
         runTest({}, tcb, async, (rootTC, refresh) => {
-          sinon.spy(rootTC.componentInstance, "onCloseStart");
-          sinon.spy(rootTC.componentInstance, "onCloseEnd");
+          sinon.spy(rootTC.debugElement.componentInstance, "onCloseStart");
+          sinon.spy(rootTC.debugElement.componentInstance, "onCloseEnd");
           
           expect(getAlert().length).toBe(1);
-          expect(rootTC.componentInstance.onCloseStart.called).toBeFalsy();
-          expect(rootTC.componentInstance.onCloseEnd.called).toBeFalsy();
+          expect(rootTC.debugElement.componentInstance.onCloseStart.called).toBeFalsy();
+          expect(rootTC.debugElement.componentInstance.onCloseEnd.called).toBeFalsy();
           
           cpt.close();
           refresh();
           clock.tick(0);
           expect(getAlert().length).toBe(0);
-          expect(rootTC.componentInstance.onCloseStart.callCount).toBe(1);
-          expect(rootTC.componentInstance.onCloseEnd.callCount).toBe(1);
+          expect(rootTC.debugElement.componentInstance.onCloseStart.callCount).toBe(1);
+          expect(rootTC.debugElement.componentInstance.onCloseEnd.callCount).toBe(1);
           
           cpt.opened = true;
           refresh();
           clock.tick(0);
           expect(getAlert().length).toBe(1);
-          expect(rootTC.componentInstance.onCloseStart.callCount).toBe(1);
-          expect(rootTC.componentInstance.onCloseEnd.callCount).toBe(1);
+          expect(rootTC.debugElement.componentInstance.onCloseStart.callCount).toBe(1);
+          expect(rootTC.debugElement.componentInstance.onCloseEnd.callCount).toBe(1);
         });
       }));
 	  

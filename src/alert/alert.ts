@@ -1,11 +1,9 @@
-import {Component, View, ElementRef, NgIf, EventEmitter} from 'angular2/angular2';
+import {Component, ElementRef, NgIf, EventEmitter} from 'angular2/angular2';
 
 @Component({
   selector: 'alert',
     properties: ['type', 'dismissible', 'fade', 'opened'],
-    events: ['closestart', 'closeend']
-})
-@View({
+    events: ['closestart', 'closeend'],
   templateUrl: './alert/alert.html',
   directives: [NgIf]
 })

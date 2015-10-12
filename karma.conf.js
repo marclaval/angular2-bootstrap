@@ -15,8 +15,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'dist/dev/lib/es6-shim.js',
       'dist/dev/lib/shims_for_old_browsers.js',
-      'dist/dev/lib/traceur-runtime.js',
       'node_modules/systemjs/dist/system.js',
       'dist/dev/lib/angular2.dev.js',
       
