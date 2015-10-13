@@ -63,9 +63,7 @@ export class CarouselCaption {
     '(mouseenter)': 'toggleAutomaticSliding()',
     '(mouseleave)': 'toggleAutomaticSliding()'
   },
-  events: ['indexchange', 'slidestart', 'slideend']
-})
-@View({
+  events: ['indexchange', 'slidestart', 'slideend'],
   templateUrl: './carousel/carousel.html',
   directives: [NgFor, NgIf]
 })

@@ -6,17 +6,15 @@ import {Samples} from "./samples/samples";
 import {NotFound} from "./content/not-found";
 
 @Component({
-  selector: 'demo-app'
+  selector: 'demo-app',
+  templateUrl: 'demo-app.html',
+  directives: [RouterOutlet, RouterLink]
 })
 @RouteConfig([
   { path: '/', component: Samples, as: 'Samples' },
   { path: '/sample/:name', component: Sample, as: 'Sample'},
   { path: '/:whatever', component: NotFound, as: 'NotFound' }
 ])
-@View({
-  templateUrl: 'demo-app.html',
-  directives: [RouterOutlet, RouterLink]
-})
 export class DemoApp {
 }
 
