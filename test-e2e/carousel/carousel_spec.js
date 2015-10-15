@@ -14,20 +14,20 @@ describe("Carousel", function() {
     element.all(by.css("carousel div.carousel ol.carousel-indicators li")).then(function(dots) {
       expect(dots.length).toBe(length);
       for (var i = 0; i < length; i++) {
-        expect(dots[i].getAttribute('class')).toBe('ng-binding' + (activeIndex === i ? ' active' : ''));  
+        expect(dots[i].getAttribute('class')).toBe((activeIndex === i ? 'active' : ''));  
       }
     });
     element.all(by.css("carousel div.carousel div.carousel-inner carousel-slide")).then(function(slides) {
       expect(slides.length).toBe(length);
       for (var i = 0; i < length; i++) {
-        expect(slides[i].getAttribute('class')).toBe('ng-binding item' + (activeIndex === i ? ' active' : ''));  
+        expect(slides[i].getAttribute('class')).toBe('item' + (activeIndex === i ? ' active' : ''));  
       }
     });
     element.all(by.css("carousel div.carousel a.carousel-control")).then(function(arrows) {
       expect(arrows.length).toBe(2);
-      expect(arrows[0].getAttribute('class')).toBe('left carousel-control ng-binding');
+      expect(arrows[0].getAttribute('class')).toBe('left carousel-control');
       expect(arrows[0].getAttribute('hidden')).toBe(isLeftArrowShown ? null : '');
-      expect(arrows[1].getAttribute('class')).toBe('right carousel-control ng-binding');
+      expect(arrows[1].getAttribute('class')).toBe('right carousel-control');
       expect(arrows[0].getAttribute('hidden')).toBe(isRightArrowShown ? null : '');
     });
   }

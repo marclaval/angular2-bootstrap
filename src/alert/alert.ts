@@ -1,11 +1,11 @@
-import {Component, ElementRef, NgIf, EventEmitter} from 'angular2/angular2';
+import {Component, ElementRef, NgIf, NgClass, EventEmitter} from 'angular2/angular2';
 
 @Component({
   selector: 'alert',
   properties: ['type', 'dismissible', 'fade', 'opened'],
   events: ['closestart', 'closeend'],
   templateUrl: './alert/alert.html',
-  directives: [NgIf]
+  directives: [NgIf, NgClass]
 })
 export class Alert {
   static alertTypes = ['success', 'info', 'warning', 'danger'];
