@@ -12,7 +12,7 @@ export class Alert {
   private _el: HTMLElement;
   private _transitionEnd: string = getTransitionEnd();
   private _dismissible: boolean = true;
-  private _fade: boolean = true;
+  private _fade: boolean = getTransitionEnd() != null;
   private _in: boolean = true;
   private _type: string = Alert.alertTypes[3];
   private _opened: boolean = true;
