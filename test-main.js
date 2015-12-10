@@ -15,11 +15,11 @@ System.config({
   paths: {
     'angular2-bootstrap': 'dist/dev/angular2-bootstrap.js',
     'angular2/*': 'node_modules/angular2/*.js',
-    '@reactivex/rxjs/*': 'node_modules/angular2/node_modules/@reactivex/rxjs/*.js'
+    'rxjs/*': 'node_modules/rxjs/*.js'
   }
 });
 
-System.import('angular2/src/core/dom/browser_adapter').then(function(browser_adapter) {
+System.import('angular2/src/platform/browser/browser_adapter').then(function(browser_adapter) {
   browser_adapter.BrowserDomAdapter.makeCurrent();
 }).then(function() {
   return Promise.all(

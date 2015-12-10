@@ -4,13 +4,12 @@ import {
   beforeEach,
   ddescribe,
   describe,
-  el,
   expect,
   iit,
   inject,
   it,
   xit
-} from 'angular2/test_lib';
+} from 'angular2/testing';
 import {Component, View, NgIf} from 'angular2/angular2';
 import {Carousel, CarouselSlide, CarouselCaption} from 'angular2-bootstrap';
 

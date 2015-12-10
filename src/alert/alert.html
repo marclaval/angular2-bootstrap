@@ -1,5 +1,5 @@
-<div *ng-if="_opened" class="alert alert-{{_type}}" [ng-class]="{'alert-dismissible': _dismissible, 'fade': _fade, 'in': _in}" role="alert">
-    <button *ng-if="_dismissible" type="button" class="close" aria-label="Close" (click)="close()">
+<div *ngIf="_opened" class="alert alert-{{_type}}" [ngClass]="{'alert-dismissible': _dismissible, 'fade': _fade, 'in': _in}" role="alert">
+    <button *ngIf="_dismissible" type="button" class="close" aria-label="Close" (click)="close()">
         <span aria-hidden="true">&times;</span>
     </button>
     <ng-content></ng-content>

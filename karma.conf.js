@@ -19,6 +19,7 @@ module.exports = function(config) {
       'dist/dev/lib/shims_for_old_browsers.js',
       'node_modules/systemjs/dist/system.js',
       'dist/dev/lib/angular2.dev.js',
+      'node_modules/angular2/bundles/testing.js',
       
       { pattern: 'dist/dev/**/*.js', included: false, watched: false },
       { pattern: 'dist/dev/**/*.html', included: false, watched: false },

@@ -4,13 +4,12 @@ import {
   beforeEach,
   ddescribe,
   describe,
-  el,
   expect,
   iit,
   inject,
   it,
   xit
-} from 'angular2/test_lib';
+} from 'angular2/testing';
 import {Component, View} from 'angular2/angular2';
 import {Alert} from 'angular2-bootstrap';
 

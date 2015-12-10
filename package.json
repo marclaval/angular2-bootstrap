@@ -45,8 +45,8 @@
     "through2": "~0.6.3"
   },
   "dependencies": {
-    "angular2": "2.0.0-alpha.44",
-    "systemjs": "~0.19.4",
+    "angular2": "2.0.0-alpha.52",
+    "systemjs": "~0.19.6",
     "es6-shim": "~0.33.6"
   }
 }

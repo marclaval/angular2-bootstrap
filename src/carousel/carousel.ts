@@ -90,7 +90,7 @@ export class Carousel {
   constructor(@Query(CarouselSlide) query: QueryList<CarouselSlide>, el: ElementRef) {
     this._el = el;
     this._startCycling();
-    (<any>query.changes).toRx().subscribe(_ => this._registerSlides(query));
+    query.changes.subscribe(_ => this._registerSlides(query));
   }
   
   private _registerSlides(query: QueryList<CarouselSlide>): void {
