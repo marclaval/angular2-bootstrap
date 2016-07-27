@@ -1,4 +1,11 @@
-!!! Work in progress !!!
+!!! Deprecated !!!
+========================
+Please use the official angular-ui project: https://github.com/ng-bootstrap/ng-bootstrap
+
+
+
+
+In case you still want to run this old code:
 ========================
 
 Project started from: https://github.com/mgechev/angular2-seed  
